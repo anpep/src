@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+##
+## Copyright (C) 2023 Ángel Pérez <ap@anpep.co>
+##
+## This program is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the Free
+## Software Foundation, either version 3 of the License, or (at your option)
+## any later version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+## more details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+if __name__ != "__main__":
+	raise Exception("This module is meant to be invoked as a program.")
+
+import re
+import json
+import pathlib
+import os.path
+
+tool_path = os.path.dirname(os.path.abspath(__file__))
+root_path = os.path.realpath(os.path.join(tool_path, ".."))
+
+# Regular expression that matches Makefile variables spanning multiple lines
+# and not containing other variables or functions.
+mkfile_var_pat = re.compile(r"(.*?)[\s:?]*=\s*((?:[^\$]|\n)*?[^\\])$", re.M)
+
+# _find_mkfile_variables obtains a dictionary containing variables from a Makefile.
+def _find_mkfile_variables(text: str) -> dict:
+	m = mkfile_var_pat.findall(text)
+	return {
+		k: "".join([line.strip().rstrip("\\") for line in v.split("\n")])
+		for k, v in dict(m).items()
+	}
+
+# _find_targets parses the top-level Makefile to obtain the system build targets.
+def _find_targets() -> list:
+	with open(os.path.join(root_path, "Makefile")) as mkfile:
+		v = _find_mkfile_variables(mkfile.read())
+		return v.get("TARGETS", "").split(" ")
+
+# _get_cmd obtains the command used to build files for the given target.
+def _get_cmd(target_name: str) -> callable:
+	with open(os.path.join(root_path, target_name, "Makefile")) as mkfile:
+		v = _find_mkfile_variables(mkfile.read())
+		base_cmd = " ".join((v.get("CC", "cc"), v.get("CFLAGS", ""))).strip()
+		return lambda file_path: " ".join((
+			base_cmd,
+			"-c", file_path,
+			"-o", os.path.splitext(file_path)[0] + ".o")
+		)
+
+# _save_compile_commands saves exports the compilation database to a JSON file.
+def _save_compile_commands(targets: list, file_name: str) -> None:
+	compile_commands = [
+		{
+			"directory": target_path,
+			"command": get_cmd_fn(str(file_path)),
+			"file": str(file_path),
+		}
+		for (target_path, get_cmd_fn, file_path) in [
+			(target_path, get_cmd_fn, file_path)
+			for target_path, get_cmd_fn
+			in [
+				(os.path.join(root_path, target_name), _get_cmd(target_name))
+				for target_name
+				in targets
+			]
+			for file_path
+			in pathlib.Path(target_path).rglob("*.c")
+		]
+	]
+	with open(os.path.join(root_path, file_name), "w") as db:
+		json.dump(compile_commands, db, indent="\t")
+
+_save_compile_commands(_find_targets(), "compile_commands.json")

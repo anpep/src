@@ -1,0 +1,6 @@
+---
+InheritParentConfig: true
+
+# We include the UUT source file directly, which is forbidden by the global
+# clang-tidy configuration.
+Checks: '-bugprone-suspicious-include,-readability-inconsistent-declaration-parameter-name'

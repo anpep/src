@@ -1,0 +1,29 @@
+# Exclude everything inside directories (targets),
+/*/*
+/*/*/*
+# except other directories,
+!/*/*/
+# and C sources and header files.
+!/*/*.[ch]
+!/*/*/*.[ch]
+
+# Files in tool/ should have no extension, so include every file from tool/
+!/tool/*
+# except those that do have an extension.
+/tool/*.*
+
+# Exclude everything from the top-level directory,
+/*
+# except other directories (targets and the tool/ directory),
+!/*/
+
+# Makefiles should always be included, from any directory!
+!Makefile
+# As well as some special files.
+!.clang-format
+!.clang-tidy
+!.gitignore
+!COPYING
+!README.md
+!/.github
+!/.github/*/*

@@ -1,0 +1,3 @@
+---
+Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,modernize-*,performance-*,readability-*,hicpp-*,-readability-magic-numbers,-readability-function-cognitive-complexity,-modernize-macro-to-enum,-clang-diagnostic-pragma-once-outside-header,-readability-non-const-parameter,-readability-identifier-length,-bugprone-easily-swappable-parameters'
+FormatStyle: file
