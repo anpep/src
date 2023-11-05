@@ -1,0 +1,40 @@
+##
+## Copyright (C) 2023 Ángel Pérez <ap@anpep.co>
+##
+## This program is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by the Free
+## Software Foundation, either version 3 of the License, or (at your option)
+## any later version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of  MERCHANTABILITY or
+## FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+## more details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+CC ?= cc
+LD ?= ld
+
+CFLAGS := \
+	-x c -std=c99 \
+	-ffreestanding -fno-builtin -nostdlib -nostdinc \
+	-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter \
+	-I../include \
+	-D_KERNEL \
+	-D'asm(...)=_Static_assert(0,"inline assembly not allowed")' \
+	-D__asm=asm -D__asm__=asm
+LDFLAGS := \
+	-nostdlib
+
+SOURCES := $(wildcard **/*.c *.c)
+OBJECTS := $(patsubst %.c,%.o,${SOURCES})
+
+all: ${OBJECTS}
+
+clean:
+	${RM} ${OBJECTS}
+
+.PHONY: all clean
