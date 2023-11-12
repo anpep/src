@@ -12,5 +12,12 @@ jobs:
       uses: actions/checkout@main
     - name: Build the system
       run: make sys
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@main
+    - name: Build the system
+      run: make sys
     - name: Run system tests
       run: make test
