@@ -19,10 +19,9 @@ CC ?= cc
 CFLAGS := \
 	-std=c99 -fprofile-arcs -ftest-coverage \
 	-Wall -Wextra \
-	-I../include \
 	-D_TEST
 
-SOURCES := $(wildcard **/*.c *.c)
+SOURCES := $(wildcard */*.c *.c)
 BINARIES := $(patsubst %.c,%,${SOURCES})
 
 all: test

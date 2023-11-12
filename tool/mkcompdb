@@ -21,7 +21,7 @@ if __name__ != "__main__":
 
 import re
 import json
-import glob
+import pathlib
 import os.path
 
 tool_path = os.path.dirname(os.path.abspath(__file__))
@@ -61,8 +61,8 @@ def _save_compile_commands(targets: list, file_name: str) -> None:
 	compile_commands = [
 		{
 			"directory": target_path,
-			"command": get_cmd_fn(file_path),
-			"file": file_path,
+			"command": get_cmd_fn(str(file_path)),
+			"file": str(file_path),
 		}
 		for (target_path, get_cmd_fn, file_path) in [
 			(target_path, get_cmd_fn, file_path)
@@ -73,7 +73,7 @@ def _save_compile_commands(targets: list, file_name: str) -> None:
 				in targets
 			]
 			for file_path
-			in glob.glob(os.path.join(target_path, "*.c"))
+			in pathlib.Path(target_path).rglob("*.c")
 		]
 	]
 	with open(os.path.join(root_path, file_name), "w") as db:

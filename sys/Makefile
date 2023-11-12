@@ -23,13 +23,11 @@ CFLAGS := \
 	-ffreestanding -fno-builtin -nostdlib -nostdinc \
 	-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter \
 	-I../include \
-	-D_KERNEL \
-	-D'asm(...)=_Static_assert(0,"inline assembly not allowed")' \
-	-D__asm=asm -D__asm__=asm
+	-D_KERNEL
 LDFLAGS := \
 	-nostdlib
 
-SOURCES := $(wildcard **/*.c *.c)
+SOURCES := $(wildcard */*.c *.c)
 OBJECTS := $(patsubst %.c,%.o,${SOURCES})
 
 all: ${OBJECTS}
