@@ -20,7 +20,7 @@
 #include <stdint.h>
 
 /* Flags for conversion specifiers. */
-enum convspec_flags : unsigned {
+enum convspec_flags {
     /* Use an alternate form for the conversion. The effect of this flag
      * depends on the specifier */
     CONVSPEC_HASH = 1U << 1U,
