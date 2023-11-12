@@ -15,24 +15,21 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 #include <stdint.h>
 
 /* Flags for conversion specifiers. */
-enum convspec_flags {
-    /* Use an alternate form for the conversion. The effect of this flag
-     * depends on the specifier */
-    CONVSPEC_HASH = 1U << 1U,
-    /* Use a space (' ') before a positive number. */
-    CONVSPEC_SPACE = 1U << 2U,
-    /* Use a plus ('+') before a positive number. */
-    CONVSPEC_PLUS = 1U << 3U,
-    /* Pad numbers with leading zeros instead of spaces. */
-    CONVSPEC_ZERO = 1U << 4U,
-    /* Pad numbers to the left instead of to the right. */
-    CONVSPEC_MINUS = 1U << 5U,
-};
+
+/* Use an alternate form for the conversion. The effect of this flag
+ * depends on the specifier */
+#define CONVSPEC_HASH (1U << 1U)
+/* Use a space (' ') before a positive number. */
+#define CONVSPEC_SPACE (1U << 2U)
+/* Use a plus ('+') before a positive number. */
+#define CONVSPEC_PLUS (1U << 3U)
+/* Pad numbers with leading zeros instead of spaces. */
+#define CONVSPEC_ZERO (1U << 4U)
+/* Pad numbers to the left instead of to the right. */
+#define CONVSPEC_MINUS (1U << 5U)
 
 enum convspec_length {
     /* Specifies that the specifier applies to a char argument. */
@@ -60,7 +57,7 @@ struct convspec {
     uintmax_t argno;
     int has_argno;
 
-    enum convspec_flags flags;
+    unsigned flags;
     int has_flags;
 
     /* Minimum field with used for right-adjusting the field with space

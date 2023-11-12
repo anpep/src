@@ -16,9 +16,12 @@
 ##
 
 CLANG_FORMAT ?= clang-format
+CLANG_TIDY ?= clang-tidy
 CC ?= cc
 LD ?= ld
 
+CLANG_FORMAT_FLAGS ?= -style file -Werror
+CLANG_TIDY_FLAGS ?= -header-filter=.* -system-headers
 CLANG_FORMAT_FLAGS ?= -style file -Werror
 CFLAGS := \
 	-x c -std=c99 \
@@ -40,5 +43,6 @@ clean:
 
 lint:
 	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES} 
+	${CLANG_TIDY} ${CLANG_TIDY_FLAGS} ${HEADERS} ${SOURCES} -- ${CFLAGS}
 
 .PHONY: all clean lint

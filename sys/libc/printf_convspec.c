@@ -54,7 +54,7 @@ static int parse_argno(struct convspec *convspec, const char *fmt)
 
 #define SET_FLAG_ONCE(dst, f)                                     \
     {                                                             \
-        if (((dst) & (f)) != 0U) {                                \
+        if (((dst) & (f)) != 0) {                                 \
             /* Flag already set -- return and parse next part. */ \
             return retval;                                        \
         }                                                         \

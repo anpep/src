@@ -16,9 +16,11 @@
 ##
 
 CLANG_FORMAT ?= clang-format
+CLANG_TIDY ?= clang-tidy
 CC ?= cc
 
 CLANG_FORMAT_FLAGS ?= -style file -Werror
+CLANG_TIDY_FLAGS ?= -header-filter=.*
 CFLAGS := \
 	-std=c99 -fprofile-arcs -ftest-coverage \
 	-Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter \
@@ -37,6 +39,7 @@ clean:
 	${RM} ${BINARIES} *.gcno *.gcda *.gcov
 
 lint:
-	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES} 
+	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES}
+	${CLANG_TIDY} ${CLANG_TIDY_FLAGS} ${HEADERS} ${SOURCES} -- ${CFLAGS}
 
 .PHONY: all clean lint
