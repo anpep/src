@@ -16,4 +16,5 @@ jobs:
       uses: actions/checkout@main
     - name: Run system tests
       run: make sys_test
+      env:
         CC: ${{ matrix.cc }}
