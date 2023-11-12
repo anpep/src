@@ -24,6 +24,6 @@
 !.clang-tidy
 !.gitignore
 !COPYING
-!README
+!README.md
 !/.github
 !/.github/*/*
