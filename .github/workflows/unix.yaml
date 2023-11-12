@@ -1,4 +1,4 @@
-name: unix
+name: Build the system and run tests
 on:
   push:
     branches: [ trunk ]
