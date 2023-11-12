@@ -1,6 +1,6 @@
-[![lint](https://github.com/anpep/unix/actions/workflows/lint.yaml/badge.svg)](https://github.com/anpep/unix/actions/workflows/lint.yaml)
-[![build](https://github.com/anpep/unix/actions/workflows/build.yaml/badge.svg)](https://github.com/anpep/unix/actions/workflows/build.yaml)
-[![test](https://github.com/anpep/unix/actions/workflows/test.yaml/badge.svg)](https://github.com/anpep/unix/actions/workflows/test.yaml)
+[![lint](../../actions/workflows/lint.yaml/badge.svg)](../../actions/workflows/lint.yaml)
+[![build](../../actions/workflows/build.yaml/badge.svg)](../../actions/workflows/build.yaml)
+[![test](../../actions/workflows/test.yaml/badge.svg)](../../actions/workflows/test.yaml)
 
 About
 =====
