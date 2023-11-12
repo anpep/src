@@ -24,6 +24,7 @@ CFLAGS := \
 	-Wall -Wextra \
 	-D_TEST
 
+HEADERS := $(wildcard */*.h *.h)
 SOURCES := $(wildcard */*.c *.c)
 BINARIES := $(patsubst %.c,%,${SOURCES})
 

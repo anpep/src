@@ -29,8 +29,8 @@ CFLAGS := \
 LDFLAGS := \
 	-nostdlib
 
-SOURCES := $(wildcard */*.c *.c)
 HEADERS := $(wildcard */*.h *.h)
+SOURCES := $(wildcard */*.c *.c)
 OBJECTS := $(patsubst %.c,%.o,${SOURCES})
 
 all: ${OBJECTS}
