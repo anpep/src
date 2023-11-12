@@ -6,10 +6,11 @@ on:
     branches: [ trunk ]
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest]
         cc: [gcc, clang]
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@main
@@ -18,10 +19,11 @@ jobs:
       env:
         CC: ${{ matrix.cc }}
   test:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest]
         cc: [gcc, clang]
+    runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@main
