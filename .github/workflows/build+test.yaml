@@ -7,17 +7,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc: [gcc, clang]
     steps:
     - name: Checkout repository
       uses: actions/checkout@main
     - name: Build the system
       run: make sys
+      env:
+        CC: ${{ matrix.cc }}
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc: [gcc, clang]
     steps:
     - name: Checkout repository
       uses: actions/checkout@main
     - name: Build the system
       run: make sys
+      env:
+        CC: ${{ matrix.cc }}
     - name: Run system tests
       run: make test
+      env:
+        CC: ${{ matrix.cc }}
