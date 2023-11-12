@@ -108,7 +108,7 @@ static int parse_width(struct convspec *convspec, const char *fmt)
 
     /* Parsed a valid width syntax. */
     convspec->width = retval;
-    convspec->has_width = 1;
+    convspec->has_width = endptr != fmt;
     /* endptr returned by strtoumax() MUST be a pointer to a character
        within as fmt. Return the number of characters to skip. */
     return (int)((ptrdiff_t)(endptr - fmt));
