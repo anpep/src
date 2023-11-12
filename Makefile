@@ -25,6 +25,9 @@ mkcompdb: FORCE
 .PHONY: clean $(addprefix clean_,${TARGETS})
 clean: $(addprefix clean_,${TARGETS})
 
+.PHONY: lint $(addprefix lint_,${TARGETS})
+lint: $(addprefix lint_,${TARGETS})
+
 FORCE: ;
 
 define target_template
@@ -33,6 +36,9 @@ ${1}: FORCE
 
 clean_${1}: FORCE
 	@${MAKE} -C ${1} clean
+
+lint_${1}: FORCE
+	@${MAKE} -C ${1} lint
 endef
 
 $(foreach target,${TARGETS},$(eval $(call target_template,${target})))

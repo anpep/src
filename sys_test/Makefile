@@ -15,7 +15,10 @@
 ## this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+CLANG_FORMAT ?= clang-format
 CC ?= cc
+
+CLANG_FORMAT_FLAGS ?= -style file -Werror
 CFLAGS := \
 	-std=c99 -fprofile-arcs -ftest-coverage \
 	-Wall -Wextra \
@@ -32,4 +35,7 @@ test: ${BINARIES}
 clean:
 	${RM} ${BINARIES} *.gcno *.gcda *.gcov
 
-.PHONY: all test clean
+lint:
+	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES} 
+
+.PHONY: all clean lint

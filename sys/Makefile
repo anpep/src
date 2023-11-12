@@ -15,9 +15,11 @@
 ## this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+CLANG_FORMAT ?= clang-format
 CC ?= cc
 LD ?= ld
 
+CLANG_FORMAT_FLAGS ?= -style file -Werror
 CFLAGS := \
 	-x c -std=c99 \
 	-ffreestanding -fno-builtin -nostdlib -nostdinc \
@@ -28,6 +30,7 @@ LDFLAGS := \
 	-nostdlib
 
 SOURCES := $(wildcard */*.c *.c)
+HEADERS := $(wildcard */*.h *.h)
 OBJECTS := $(patsubst %.c,%.o,${SOURCES})
 
 all: ${OBJECTS}
@@ -35,4 +38,7 @@ all: ${OBJECTS}
 clean:
 	${RM} ${OBJECTS}
 
-.PHONY: all clean
+lint:
+	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES} 
+
+.PHONY: all clean lint
