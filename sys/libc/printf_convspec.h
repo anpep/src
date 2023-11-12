@@ -65,12 +65,12 @@ struct convspec {
 
     /* Minimum field with used for right-adjusting the field with space
      * characters. */
-    unsigned width;
+    uintmax_t width;
     int has_width;
 
     /* For integer conversions, indicates the minimum number of digits.
      * For string conversions, indicates the maximum number of bytes. */
-    unsigned prec;
+    uintmax_t prec;
     int has_prec;
 
     /* Argument length modifier. Its effect depends on the specifier. */

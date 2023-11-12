@@ -27,7 +27,7 @@
 static int parse_argno(struct convspec *convspec, const char *fmt)
 {
     char *endptr;
-    int retval;
+    uintmax_t retval;
 
     errno = 0;
     endptr = NULL;
@@ -95,7 +95,7 @@ static int parse_flags(struct convspec *convspec, const char *fmt)
 static int parse_width(struct convspec *convspec, const char *fmt)
 {
     char *endptr;
-    int retval;
+    uintmax_t retval;
 
     errno = 0;
     endptr = NULL;
@@ -119,7 +119,7 @@ static int parse_precision(
 {
     const char *fmt_initial = fmt;
     char *endptr;
-    int retval;
+    uintmax_t retval;
 
     if (*fmt != '.') {
         return 0;
