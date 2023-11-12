@@ -1,0 +1,20 @@
+name: build
+on:
+  push:
+    branches: [trunk]
+  pull_request:
+    branches: [trunk]
+jobs:
+  sys:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        cc: [gcc, clang]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@main
+    - name: Build the system
+      run: make sys
+      env:
+        CC: ${{ matrix.cc }}

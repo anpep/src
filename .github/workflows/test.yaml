@@ -1,0 +1,19 @@
+name: test
+on:
+  push:
+    branches: [trunk]
+  pull_request:
+    branches: [trunk]
+jobs:
+  sys:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        cc: [gcc, clang]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@main
+    - name: Run system tests
+      run: make sys_test
+        CC: ${{ matrix.cc }}
