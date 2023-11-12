@@ -21,7 +21,7 @@ CC ?= cc
 CLANG_FORMAT_FLAGS ?= -style file -Werror
 CFLAGS := \
 	-std=c99 -fprofile-arcs -ftest-coverage \
-	-Wall -Wextra \
+	-Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter \
 	-D_TEST
 
 HEADERS := $(wildcard */*.h *.h)

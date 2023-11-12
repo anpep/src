@@ -57,7 +57,7 @@ static void test_strtol(void)
     errno = 0;
     input = "101001";
     retval = strtol(input, NULL, 2);
-    assert(retval == 0b101001);
+    assert(retval == 41);
     assert(errno == 0);
 
     /* Test explicit base-36 with no endptr. */
@@ -105,7 +105,7 @@ static void test_strtoul(void)
     assert(!strcmp(endptr, "-1"));
 }
 
-int main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
+int main(int argc, char **argv)
 {
     test_strtol();
     test_strtoul();

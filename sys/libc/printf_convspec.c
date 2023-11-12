@@ -52,15 +52,15 @@ static int parse_argno(struct convspec *convspec, const char *fmt)
     return (int)((ptrdiff_t)(endptr - fmt));
 }
 
-#define SET_FLAG_ONCE(dst, f)                                                  \
-    {                                                                          \
-        if (((dst) & (f)) != 0U) {                                             \
-            /* Flag already set -- return and parse next part. */              \
-            return retval;                                                     \
-        }                                                                      \
-        /* Flag not yet set. */                                                \
-        (dst) |= (f);                                                          \
-        convspec->has_flags = 1;                                               \
+#define SET_FLAG_ONCE(dst, f)                                     \
+    {                                                             \
+        if (((dst) & (f)) != 0U) {                                \
+            /* Flag already set -- return and parse next part. */ \
+            return retval;                                        \
+        }                                                         \
+        /* Flag not yet set. */                                   \
+        (dst) |= (f);                                             \
+        convspec->has_flags = 1;                                  \
     }
 
 static int parse_flags(struct convspec *convspec, const char *fmt)

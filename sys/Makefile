@@ -23,7 +23,7 @@ CLANG_FORMAT_FLAGS ?= -style file -Werror
 CFLAGS := \
 	-x c -std=c99 \
 	-ffreestanding -fno-builtin -nostdlib -nostdinc \
-	-Wall -Wextra -Wno-unused-variable -Wno-unused-parameter \
+	-Wall -Wextra -Wpedantic -pedantic -Wno-unused-variable -Wno-unused-parameter \
 	-I../include \
 	-D_KERNEL
 LDFLAGS := \
