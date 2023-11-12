@@ -28,3 +28,63 @@ inline __attribute__((always_inline)) int isdigit(int chr)
 {
     return chr >= '0' && chr <= '9';
 }
+
+/**
+ * @brief      Test whether the given character is a space.
+ *
+ * @param[in]  chr   The character to test.
+ *
+ * @return     1 if the character is a space, otherwise 0.
+ */
+inline __attribute__((always_inline)) int isspace(int chr)
+{
+    return chr == ' ' || chr == '\t' || chr == '\v' || chr == '\n';
+}
+
+/**
+ * @brief      Test whether the given character is a lowercase letter.
+ *
+ * @param[in]  chr   The character to test.
+ *
+ * @return     1 if the character is lowercase, otherwise 0.
+ */
+inline __attribute__((always_inline)) int islower(int chr)
+{
+    return chr >= 'a' && chr <= 'z';
+}
+
+/**
+ * @brief      Test whether the given character is an uppercase letter.
+ *
+ * @param[in]  chr   The character to test.
+ *
+ * @return     1 if the character is uppercase, otherwise 0.
+ */
+inline __attribute__((always_inline)) int isupper(int chr)
+{
+    return chr >= 'A' && chr <= 'Z';
+}
+
+/**
+ * @brief      Convert a character to lowercase.
+ *
+ * @param[in]  chr   The character to be converted.
+ *
+ * @return     The converted character.
+ */
+inline __attribute__((always_inline)) int tolower(int chr)
+{
+    return isupper(chr) ? (chr + ('a' - 'A')) : chr;
+}
+
+/**
+ * @brief      Convert a character to lowercase.
+ *
+ * @param[in]  chr   The character to be converted.
+ *
+ * @return     The converted character.
+ */
+inline __attribute__((always_inline)) int toupper(int chr)
+{
+    return islower(chr) ? (chr + ('A' - 'a')) : chr;
+}

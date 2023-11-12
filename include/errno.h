@@ -20,5 +20,7 @@
 extern int errno;
 
 enum {
+    EINVAL = 22, /* Invalid argument */
+    ERANGE = 34, /* Numerical result out of range */
     ENOSYS = 38, /* Function not implemented */
 };

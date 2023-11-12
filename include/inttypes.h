@@ -19,5 +19,39 @@
 
 #include <stdint.h>
 
-intmax_t strtoimax(const char *restrict, char **restrict, int);
-uintmax_t strtoumax(const char *restrict, char **restrict, int);
+/**
+ * @brief      Convert the given string to an intmax_t value.
+ *
+ * @param[in]  nptr    The string to be converted.
+ * @param      endptr  If not NULL, a pointer to a string starting immediately
+ *                     after the last valid digit of a numerical character
+ *                     sequence.
+ * @param[in]  base    The base (between 2 and 36, including both) to be used
+ *                     when converting the string. If 0, the base will be
+ *                     guessed accepting the "0x" and "0X" prefixes for
+ *                     indicating a base of 16, and the "0" prefix for
+ *                     indicating a base of 8.
+ *
+ * @return     The parsed numeric value. If no conversion could be made,
+ *             0 is returned and errno is set accordingly.
+ */
+intmax_t strtoimax(const char *restrict nptr, char **restrict endptr, int base);
+
+/**
+ * @brief      Convert the given string to an uintmax_t value.
+ *
+ * @param[in]  nptr    The string to be converted.
+ * @param      endptr  If not NULL, a pointer to a string starting immediately
+ *                     after the last valid digit of a numerical character
+ *                     sequence.
+ * @param[in]  base    The base (between 2 and 36, including both) to be used
+ *                     when converting the string. If 0, the base will be
+ *                     guessed accepting the "0x" and "0X" prefixes for
+ *                     indicating a base of 16, and the "0" prefix for
+ *                     indicating a base of 8.
+ *
+ * @return     The parsed numeric value. If no conversion could be made,
+ *             0 is returned and errno is set accordingly.
+ */
+uintmax_t strtoumax(
+    const char *restrict nptr, char **restrict endptr, int base);

@@ -15,32 +15,32 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <errno.h>
-#include <stdlib.h>
+#pragma once
 
-long int strtol(const char* restrict nptr, char** restrict endptr, int base)
-{
-    errno = ENOSYS;
-    return -1;
-}
+/* Numerical limits. */
 
-long long int strtoll(
-    const char* restrict nptr, char** restrict endptr, int base)
-{
-    errno = ENOSYS;
-    return -1;
-}
+#define CHAR_BIT (8 * sizeof(char))
+#define CHAR_MAX UCHAR_MAX
+#define CHAR_MIN 0
+#define SCHAR_MAX 0x7f
+#define SCHAR_MIN (-0x7f - 1)
+#define UCHAR_MAX 0xff
 
-unsigned long int strtoul(
-    const char* restrict nptr, char** restrict endptr, int base)
-{
-    errno = ENOSYS;
-    return ~0UL;
-}
+#define SHRT_MAX 0x7fff
+#define SHRT_MIN (-0x7fff - 1)
+#define USHRT_MAX 0xffff
 
-unsigned long long int strtoull(
-    const char* restrict nptr, char** restrict endptr, int base)
-{
-    errno = ENOSYS;
-    return ~0ULL;
-}
+#define WORD_BIT 32
+#define INT_MAX 0x7fffffff
+#define INT_MIN (-0x7fffffff - 1)
+#define UINT_MAX 0xffffffff
+
+#define LONG_BIT 64
+#define LONG_MAX 0x7fffffffffffffff
+#define LONG_MIN (-0x7fffffffffffffff - 1)
+#define ULONG_MAX 0xffffffffffffffff
+
+#define LLONG_BIT 64
+#define LLONG_MAX 0x7fffffffffffffff
+#define LLONG_MIN (-0x7fffffffffffffff - 1)
+#define ULLONG_MAX 0xffffffffffffffff

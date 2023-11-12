@@ -1,5 +1,5 @@
 ---
-Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,modernize-*,performance-*,readability-*,hicpp-*'
+Checks: 'clang-diagnostic-*,clang-analyzer-*,bugprone-*,modernize-*,performance-*,readability-*,hicpp-*,-readability-magic-numbers,-readability-function-cognitive-complexity'
 HeaderFileExtensions:
   - h
 ImplementationFileExtensions:
