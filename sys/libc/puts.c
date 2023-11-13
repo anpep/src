@@ -32,12 +32,12 @@ int putchar(int val)
 
 int puts(const char *str)
 {
-    int retval;
+    int rc;
 
     while (*str++) {
-        retval = putchar(*str);
-        if (retval < 0) {
-            errno = retval;
+        rc = putchar(*str);
+        if (rc < 0) {
+            errno = rc;
             return EOF;
         }
     }

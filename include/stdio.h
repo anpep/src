@@ -42,11 +42,20 @@ int putchar(int val);
  * @return     On success, 0 is returned. Otherwise, the value of @ref errno is
  *             set and @ref EOF is returned.
  */
-int puts(const char* str);
+int puts(const char *str);
 
-int printf(const char* restrict, ...);
-int snprintf(char* restrict, size_t, const char* restrict, ...);
-int sprintf(char* restrict, const char* restrict, ...);
+/**
+ * @brief      Write a formatted string to the standard output stream.
+ *
+ * @param[in]  fmt   String to be used to format the output.
+ *
+ * @return     On success, the number of characters written is returned.
+ *             Otherwise, a negative value is returned and the value of
+ *             @ref errno is set to reflect the error.
+ */
+int printf(const char *restrict fmt, ...);
+int snprintf(char *restrict dest, size_t n, const char *restrict fmt, ...);
+int sprintf(char *restrict dest, const char *restrict fmt, ...);
 
 /**
  * @brief      Write a formatted string to the standard output stream.
@@ -58,6 +67,7 @@ int sprintf(char* restrict, const char* restrict, ...);
  *             Otherwise, a negative value is returned and the value of
  *             @ref errno is set to reflect the error.
  */
-int vprintf(const char* restrict fmt, va_list args);
-int vsnprintf(char* restrict, size_t, const char* restrict, va_list);
-int vsprintf(char* restrict, const char* restrict, va_list);
+int vprintf(const char *restrict fmt, va_list args);
+
+int vsnprintf(char *restrict dest, size_t n, const char *restrict fmt, va_list args);
+int vsprintf(char *restrict dest, const char *restrict fmt, va_list args);

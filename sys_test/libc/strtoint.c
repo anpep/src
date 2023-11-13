@@ -15,11 +15,21 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define strtol __strtol
+#define strtoll __strtoll
+#define strtoul __strtoul
+#define strtoull _strtoull
+
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#undef strtol
+#undef strtoll
+#undef strtoul
+#undef strtoull
 
 #include "../../sys/libc/strtoint.c"
 
@@ -27,65 +37,65 @@ static void test_strtol(void)
 {
     char *input;
     char *endptr;
-    long retval;
+    long rc;
 
     /* Test decimal guess with padding characters. */
     errno = 0;
     input = "    \t\v42nice";
-    retval = strtol(input, &endptr, 0);
-    assert(retval == 42);
+    rc = strtol(input, &endptr, 0);
+    assert(rc == 42);
     assert(errno == 0);
     assert(!strcmp(endptr, "nice"));
 
     /* Test octal guess. */
     errno = 0;
     input = "0777";
-    retval = strtol(input, &endptr, 0);
-    assert(retval == 0777);
+    rc = strtol(input, &endptr, 0);
+    assert(rc == 0777);
     assert(errno == 0);
     assert(!strcmp(endptr, ""));
 
     /* Test hexadecimal guess. */
     errno = 0;
     input = "0xfFfFfFfF";
-    retval = strtol(input, &endptr, 0);
-    assert(retval == 0xFFFFFFFF);
+    rc = strtol(input, &endptr, 0);
+    assert(rc == 0xFFFFFFFF);
     assert(errno == 0);
     assert(!strcmp(endptr, ""));
 
     /* Test explicit binary with no endptr. */
     errno = 0;
     input = "101001";
-    retval = strtol(input, NULL, 2);
-    assert(retval == 41);
+    rc = strtol(input, NULL, 2);
+    assert(rc == 41);
     assert(errno == 0);
 
     /* Test explicit base-36 with no endptr. */
     errno = 0;
     input = "zIK0zj";
-    retval = strtol(input, NULL, 36);
-    assert(retval == INT32_MAX);
+    rc = strtol(input, NULL, 36);
+    assert(rc == INT32_MAX);
     assert(errno == 0);
 
     /* Test explicit negative. */
     errno = 0;
     input = "-42";
-    retval = strtol(input, NULL, 10);
-    assert(retval == -42);
+    rc = strtol(input, NULL, 10);
+    assert(rc == -42);
     assert(errno == 0);
 
     /* Test explicit positive. */
     errno = 0;
     input = "+00000002";
-    retval = strtol(input, NULL, 4);
-    assert(retval == 2);
+    rc = strtol(input, NULL, 4);
+    assert(rc == 2);
     assert(errno == 0);
 
     /* Test bounds. */
     errno = 0;
     input = "-922337203685477580721234";
-    retval = strtol(input, &endptr, 10);
-    assert(retval == LONG_MIN);
+    rc = strtol(input, &endptr, 10);
+    assert(rc == LONG_MIN);
     assert(!strcmp(endptr, "21234"));
     assert(errno == ERANGE);
 }
@@ -94,13 +104,13 @@ static void test_strtoul(void)
 {
     char *input;
     char *endptr;
-    unsigned long retval;
+    unsigned long rc;
 
     /* Test decimal guess with padding characters. */
     errno = 0;
     input = "-1";
-    retval = strtoul(input, &endptr, 0);
-    assert(retval == 0);
+    rc = strtoul(input, &endptr, 0);
+    assert(rc == 0);
     assert(errno == EINVAL);
     assert(!strcmp(endptr, "-1"));
 }

@@ -27,12 +27,12 @@
 static int parse_argno(struct convspec *convspec, const char *fmt)
 {
     char *endptr;
-    uintmax_t retval;
+    uintmax_t rc;
 
     errno = 0;
     endptr = NULL;
-    retval = strtoumax(fmt, &endptr, 10);
-    if (endptr == NULL || (retval == 0 && errno != 0)) {
+    rc = strtoumax(fmt, &endptr, 10);
+    if (endptr == NULL || (rc == 0 && errno != 0)) {
         /* Not a number -- invalid argno syntax. Skip no characters in fmt. */
         errno = 0;
         return 0;
@@ -43,7 +43,7 @@ static int parse_argno(struct convspec *convspec, const char *fmt)
     }
 
     /* Parsed a valid argno syntax. */
-    convspec->argno = retval;
+    convspec->argno = rc;
     convspec->has_argno = 1;
     /* Skip final $. */
     endptr++;
@@ -52,22 +52,22 @@ static int parse_argno(struct convspec *convspec, const char *fmt)
     return (int)((ptrdiff_t)(endptr - fmt));
 }
 
-#define SET_FLAG_ONCE(dst, f)                                     \
-    {                                                             \
-        if (((dst) & (f)) != 0) {                                 \
-            /* Flag already set -- return and parse next part. */ \
-            return retval;                                        \
-        }                                                         \
-        /* Flag not yet set. */                                   \
-        (dst) |= (f);                                             \
-        convspec->has_flags = 1;                                  \
+#define SET_FLAG_ONCE(dst, f)                                                  \
+    {                                                                          \
+        if (((dst) & (f)) != 0) {                                              \
+            /* Flag already set -- return and parse next part. */              \
+            return rc;                                                         \
+        }                                                                      \
+        /* Flag not yet set. */                                                \
+        (dst) |= (f);                                                          \
+        convspec->has_flags = 1;                                               \
     }
 
 static int parse_flags(struct convspec *convspec, const char *fmt)
 {
-    int retval = 0;
+    int rc = 0;
 
-    for (;; retval++) {
+    for (;; rc++) {
         switch (*fmt) {
         case '#':
             SET_FLAG_ONCE(convspec->flags, CONVSPEC_HASH);
@@ -85,29 +85,29 @@ static int parse_flags(struct convspec *convspec, const char *fmt)
             SET_FLAG_ONCE(convspec->flags, CONVSPEC_MINUS);
             break;
         default:
-            return retval;
+            return rc;
         }
     }
 
-    return retval;
+    return rc;
 }
 
 static int parse_width(struct convspec *convspec, const char *fmt)
 {
     char *endptr;
-    uintmax_t retval;
+    uintmax_t rc;
 
     errno = 0;
     endptr = NULL;
-    retval = strtoumax(fmt, &endptr, 10);
-    if (endptr == NULL || (retval == 0 && errno != 0)) {
+    rc = strtoumax(fmt, &endptr, 10);
+    if (endptr == NULL || (rc == 0 && errno != 0)) {
         /* Not a number -- invalid width syntax. Skip no characters in fmt. */
         errno = 0;
         return 0;
     }
 
     /* Parsed a valid width syntax. */
-    convspec->width = retval;
+    convspec->width = rc;
     convspec->has_width = endptr != fmt;
     /* endptr returned by strtoumax() MUST be a pointer to a character
        within as fmt. Return the number of characters to skip. */
@@ -119,7 +119,7 @@ static int parse_precision(
 {
     const char *fmt_initial = fmt;
     char *endptr;
-    uintmax_t retval;
+    uintmax_t rc;
 
     if (*fmt != '.') {
         return 0;
@@ -129,15 +129,15 @@ static int parse_precision(
     fmt++;
     errno = 0;
     endptr = NULL;
-    retval = strtoumax(fmt, &endptr, 10);
-    if (endptr == NULL || (retval == 0 && errno != 0)) {
+    rc = strtoumax(fmt, &endptr, 10);
+    if (endptr == NULL || (rc == 0 && errno != 0)) {
         /* Not a number -- invalid width syntax. Skip no characters in fmt. */
         errno = 0;
         return 0;
     }
 
     /* Parsed a valid width syntax. */
-    convspec->prec = retval;
+    convspec->prec = rc;
     convspec->has_prec = 1;
     /* endptr returned by strtoumax() MUST be a pointer to a character
        within as fmt. Return the number of characters to skip. */
@@ -146,43 +146,43 @@ static int parse_precision(
 
 static int parse_length_modifier(struct convspec *convspec, const char *fmt)
 {
-    int retval = 0;
+    int rc = 0;
 
     switch (*fmt) {
     case 'h':
         /* h (char) */
-        fmt++, retval++;
+        fmt++, rc++;
         convspec->len = CONVSPEC_CHAR;
         if (*fmt == 'h') {
             /* hh (short) */
-            retval++;
+            rc++;
             convspec->len = CONVSPEC_SHORT;
         }
         break;
     case 'l':
         /* l (long) */
-        fmt++, retval++;
+        fmt++, rc++;
         convspec->len = CONVSPEC_LONG;
         if (*fmt == 'l') {
             /* ll (long long) */
-            retval++;
+            rc++;
             convspec->len = CONVSPEC_LONG_LONG;
         }
         break;
     case 'j':
-        fmt++, retval++;
+        fmt++, rc++;
         convspec->len = CONVSPEC_MAX;
         break;
     case 'z':
-        fmt++, retval++;
+        fmt++, rc++;
         convspec->len = CONVSPEC_SIZE;
         break;
     case 't':
-        fmt++, retval++;
+        fmt++, rc++;
         convspec->len = CONVSPEC_PTRDIFF;
         break;
     case 'L':
-        fmt++, retval++;
+        fmt++, rc++;
         convspec->len = CONVSPEC_LONG_DOUBLE;
         break;
     default:
@@ -191,7 +191,7 @@ static int parse_length_modifier(struct convspec *convspec, const char *fmt)
     }
 
     convspec->has_len = 1;
-    return retval;
+    return rc;
 }
 
 static int parse_specifier(struct convspec *convspec, const char *fmt)
@@ -273,7 +273,7 @@ static int parse_specifier(struct convspec *convspec, const char *fmt)
 int convspec_parse(struct convspec *convspec, const char *fmt)
 {
     const char *fmt_initial = fmt;
-    int retval = 0;
+    int rc = 0;
 
     convspec->argno = 0;
     convspec->has_argno = 0;
@@ -295,49 +295,49 @@ int convspec_parse(struct convspec *convspec, const char *fmt)
     /* Skip until we find a conversion specifier or the end of the string. */
     if (*fmt != '%') {
         while (*fmt != '%' && *fmt != '\0') {
-            fmt++, retval++;
+            fmt++, rc++;
         }
-        return retval;
+        return rc;
     }
 
     /* Skip initial '%' character. */
     fmt++;
 
-    retval = parse_argno(convspec, fmt);
-    if (retval < 0) {
-        return retval;
+    rc = parse_argno(convspec, fmt);
+    if (rc < 0) {
+        return rc;
     }
-    fmt += retval;
+    fmt += rc;
 
-    retval = parse_flags(convspec, fmt);
-    if (retval < 0) {
-        return retval;
+    rc = parse_flags(convspec, fmt);
+    if (rc < 0) {
+        return rc;
     }
-    fmt += retval;
+    fmt += rc;
 
-    retval = parse_width(convspec, fmt);
-    if (retval < 0) {
-        return retval;
+    rc = parse_width(convspec, fmt);
+    if (rc < 0) {
+        return rc;
     }
-    fmt += retval;
+    fmt += rc;
 
-    retval = parse_precision(convspec, fmt);
-    if (retval < 0) {
-        return retval;
+    rc = parse_precision(convspec, fmt);
+    if (rc < 0) {
+        return rc;
     }
-    fmt += retval;
+    fmt += rc;
 
-    retval = parse_length_modifier(convspec, fmt);
-    if (retval < 0) {
-        return retval;
+    rc = parse_length_modifier(convspec, fmt);
+    if (rc < 0) {
+        return rc;
     }
-    fmt += retval;
+    fmt += rc;
 
-    retval = parse_specifier(convspec, fmt);
-    if (retval < 0) {
-        return retval;
+    rc = parse_specifier(convspec, fmt);
+    if (rc < 0) {
+        return rc;
     }
-    fmt += retval;
+    fmt += rc;
 
     return (int)((ptrdiff_t)(fmt - fmt_initial));
 }

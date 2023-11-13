@@ -17,6 +17,19 @@
 
 #pragma once
 
-#include <stddef.h> /* NULL, size_t */
+#include <stddef.h>
+#include <sys/types.h>
 
-size_t strlen(const char *str);
+/**
+ * @brief      Write @ref count bytes from the buffer pointed to by @ref buf
+ *             to the file associated with the open file descriptor @ref fd.
+ *
+ * @param[in]  fd     Open file descriptor of the destination stream.
+ * @param[in]  buf    The buffer to be written to the destination stream.
+ * @param[in]  count  The number of bytes to be written.
+ *
+ * @return     On success, the number of bytes written to the destination
+ *             stream; otherwise, -1 will be returned and @ref errno will be
+ *             set accordingly.
+ */
+ssize_t write(int fd, const void *buf, size_t count);

@@ -15,8 +15,13 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include <string.h>
 
-#include <stddef.h> /* NULL, size_t */
-
-size_t strlen(const char *str);
+size_t strlen(const char *str)
+{
+    size_t len = 0;
+    while (*str++) {
+        len++;
+    }
+    return len;
+}

@@ -29,13 +29,13 @@ struct strtoint_opts {
 
 static int parse_base(char *nptr, int *base)
 {
-    int retval = 0;
+    int rc = 0;
 
     if (*nptr == '0') {
-        nptr++, retval++;
+        nptr++, rc++;
         if (*nptr == 'x' || *nptr == 'X') {
             /* Hexadecimal base specified by preceding "0x" or "0X".*/
-            nptr++, retval++;
+            nptr++, rc++;
             *base = 16;
         } else if (isdigit(*nptr)) {
             /* Octal base specified by preceding "0". */
@@ -50,7 +50,7 @@ static int parse_base(char *nptr, int *base)
         *base = 0;
     }
 
-    return retval;
+    return rc;
 }
 
 static intmax_t strtoint(const char *restrict nptr, char **restrict endptr,
