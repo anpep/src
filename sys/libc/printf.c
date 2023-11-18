@@ -149,7 +149,6 @@ ssize_t vfprintf_impl(
                 if (sizeof(void *) > sizeof(int)) {
                     cs.len = CONVSPEC_LONG;
                 }
-                cs.width = sizeof(void *) / 2;
             }
 
             if ((cs.flags & CONVSPEC_HASH)
