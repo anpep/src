@@ -104,21 +104,7 @@ ssize_t vfprintf_impl(
             }
         } else if (cs.conv == 'd' || cs.conv == 'i' || cs.conv == 'D') {
             /* Write a signed integer. */
-            intmax_t val;
-            if (cs.len == CONVSPEC_LONG) {
-                val = va_arg(args, long);
-            } else if (cs.len == CONVSPEC_LONG_LONG) {
-                val = va_arg(args, long long);
-            } else if (cs.len == CONVSPEC_MAX) {
-                val = va_arg(args, intmax_t);
-            } else if (cs.len == CONVSPEC_SIZE) {
-                val = va_arg(args, ssize_t);
-            } else if (cs.len == CONVSPEC_PTRDIFF) {
-                val = va_arg(args, ptrdiff_t);
-            } else {
-                val = va_arg(args, signed);
-            }
-
+            intmax_t val = va_arg(args, intmax_t);
             char conv[64];
             buf = &conv;
 
@@ -152,21 +138,7 @@ ssize_t vfprintf_impl(
             || cs.conv == 'u' || cs.conv == 'o' || cs.conv == 'x'
             || cs.conv == 'p') {
             /* Write an unsigned integer. */
-            uintmax_t val;
-            if (cs.len == CONVSPEC_LONG) {
-                val = va_arg(args, unsigned long);
-            } else if (cs.len == CONVSPEC_LONG_LONG) {
-                val = va_arg(args, unsigned long long);
-            } else if (cs.len == CONVSPEC_MAX) {
-                val = va_arg(args, uintmax_t);
-            } else if (cs.len == CONVSPEC_SIZE) {
-                val = va_arg(args, size_t);
-            } else if (cs.len == CONVSPEC_PTRDIFF) {
-                val = va_arg(args, unsigned long);
-            } else {
-                val = va_arg(args, unsigned);
-            }
-
+            uintmax_t val = va_arg(args, uintmax_t);
             char conv[64];
             buf = &conv;
 
