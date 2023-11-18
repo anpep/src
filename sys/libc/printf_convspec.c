@@ -71,18 +71,23 @@ static int parse_flags(struct convspec *convspec, const char *fmt)
         switch (*fmt) {
         case '#':
             SET_FLAG_ONCE(convspec->flags, CONVSPEC_HASH);
+            fmt++;
             break;
         case ' ':
             SET_FLAG_ONCE(convspec->flags, CONVSPEC_SPACE);
+            fmt++;
             break;
         case '+':
             SET_FLAG_ONCE(convspec->flags, CONVSPEC_PLUS);
+            fmt++;
             break;
         case '0':
             SET_FLAG_ONCE(convspec->flags, CONVSPEC_ZERO);
+            fmt++;
             break;
         case '-':
             SET_FLAG_ONCE(convspec->flags, CONVSPEC_MINUS);
+            fmt++;
             break;
         default:
             return rc;
@@ -150,13 +155,13 @@ static int parse_length_modifier(struct convspec *convspec, const char *fmt)
 
     switch (*fmt) {
     case 'h':
-        /* h (char) */
+        /* h (short) */
         fmt++, rc++;
-        convspec->len = CONVSPEC_CHAR;
+        convspec->len = CONVSPEC_SHORT;
         if (*fmt == 'h') {
-            /* hh (short) */
+            /* hh (char) */
             rc++;
-            convspec->len = CONVSPEC_SHORT;
+            convspec->len = CONVSPEC_CHAR;
         }
         break;
     case 'l':
@@ -238,9 +243,29 @@ static int parse_specifier(struct convspec *convspec, const char *fmt)
         }
         break;
 
+    case 'd':
+        if ((convspec->flags & CONVSPEC_HASH) != 0) {
+            /* '#' is not supported for 'd' specifier. */
+            return -1;
+        }
+        if (((convspec->flags & CONVSPEC_SPACE) != 0)
+            && (convspec->flags & CONVSPEC_PLUS) != 0) {
+            /* ' ' and '+' are mutually exclusive for 'd' specifier. */
+            return -1;
+        }
+        if (((convspec->flags & CONVSPEC_MINUS) != 0)
+            && (convspec->flags & CONVSPEC_ZERO) != 0) {
+            /* '-' and '0' are mutually exclusive for 's' specifier. */
+            return -1;
+        }
+        /* Check supported modifiers ('L' is not supported). */
+        if (convspec->len != 0 && convspec->len == CONVSPEC_LONG_DOUBLE) {
+            return -1;
+        }
+        break;
+
     case 'a':
     case 'A':
-    case 'd':
     case 'D':
     case 'e':
     case 'E':
