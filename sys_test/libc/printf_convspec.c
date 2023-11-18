@@ -333,17 +333,17 @@ static void test_parse_full_unsigned(void)
     assert(s.cs.len == CONVSPEC_CHAR);
     assert(s.cs.conv == 'u');
 
-    /* The 'd' specifier does not support '#', ' ' or '+'. */
+    /* The 'u' specifier does not support '#', ' ' or '+'. */
     s.rc = convspec_parse(&s.cs, "%#u");
     assert(s.rc < 0);
     s.rc = convspec_parse(&s.cs, "% u");
     assert(s.rc < 0);
     s.rc = convspec_parse(&s.cs, "%+u");
     assert(s.rc < 0);
-    /* The 'd' specifier does not support '-' and '0' simultaneously. */
+    /* The 'u' specifier does not support '-' and '0' simultaneously. */
     s.rc = convspec_parse(&s.cs, "%-0u");
     assert(s.rc < 0);
-    /* The 'd' specifier supports all length modifiers but 'L'. */
+    /* The 'u' specifier supports all length modifiers but 'L'. */
     s.rc = convspec_parse(&s.cs, "%hhu");
     assert(s.rc == strlen("%hhu"));
     assert(s.cs.has_len == 1);
@@ -380,6 +380,66 @@ static void test_parse_full_unsigned(void)
     assert(s.rc < 0);
 }
 
+/* Test that parsing the full %x specifier works. */
+static void test_parse_full_hex(void)
+{
+    struct state s;
+    prepare_test(&s);
+
+    s.rc = convspec_parse(&s.cs, "%1337$#-42.512hhx");
+    assert(s.rc == strlen("%1337$#-42.512hhx"));
+    assert(s.cs.argno == 1337);
+    assert(s.cs.flags == (CONVSPEC_HASH | CONVSPEC_MINUS));
+    assert(s.cs.width == 42);
+    assert(s.cs.prec == 512);
+    assert(s.cs.len == CONVSPEC_CHAR);
+    assert(s.cs.conv == 'x');
+
+    /* The 'x' specifier does not support ' ' or '+'. */
+    s.rc = convspec_parse(&s.cs, "% x");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%+x");
+    assert(s.rc < 0);
+    /* The 'x' specifier does not support '-' and '0' simultaneously. */
+    s.rc = convspec_parse(&s.cs, "%-0x");
+    assert(s.rc < 0);
+    /* The 'x' specifier supports all length modifiers but 'L'. */
+    s.rc = convspec_parse(&s.cs, "%hhx");
+    assert(s.rc == strlen("%hhx"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_CHAR);
+    s.rc = convspec_parse(&s.cs, "%hx");
+    assert(s.rc == strlen("%hx"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_SHORT);
+    s.rc = convspec_parse(&s.cs, "%x");
+    assert(s.rc == strlen("%x"));
+    assert(s.cs.has_len == 0);
+    assert(s.cs.len == 0);
+    s.rc = convspec_parse(&s.cs, "%lx");
+    assert(s.rc == strlen("%lx"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_LONG);
+    s.rc = convspec_parse(&s.cs, "%llx");
+    assert(s.rc == strlen("%llx"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_LONG_LONG);
+    s.rc = convspec_parse(&s.cs, "%jx");
+    assert(s.rc == strlen("%jx"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_MAX);
+    s.rc = convspec_parse(&s.cs, "%tx");
+    assert(s.rc == strlen("%tx"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_PTRDIFF);
+    s.rc = convspec_parse(&s.cs, "%zx");
+    assert(s.rc == strlen("%zx"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_SIZE);
+    s.rc = convspec_parse(&s.cs, "%Lx");
+    assert(s.rc < 0);
+}
+
 int main(int argc, char **argv)
 {
     test_parse_no_spec();
@@ -394,6 +454,7 @@ int main(int argc, char **argv)
     test_parse_full_string();
     test_parse_full_signed();
     test_parse_full_unsigned();
+    test_parse_full_hex();
 
     return 0;
 }

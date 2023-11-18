@@ -203,7 +203,8 @@ static int parse_specifier(struct convspec *cs, const char *fmt)
 {
     switch (*fmt) {
     case '%':
-        /* '%' supports no parts. */
+    case 'p':
+        /* '%' and 'p' support no parts. */
         if (cs->has_prec || cs->has_len || cs->has_argno || cs->has_flags
             || cs->has_width) {
             return -1;
@@ -237,7 +238,15 @@ static int parse_specifier(struct convspec *cs, const char *fmt)
         }
         break;
 
+    case 'D':
+        /* Deprecated alias for '%ld'. */
+        if (cs->has_len) {
+            return -1;
+        }
+        cs->len = CONVSPEC_LONG;
+        /* Fall through. */
     case 'd':
+    case 'i':
         if (cs->flags & CONVSPEC_HASH) {
             /* '#' is not supported for 'd' specifier. */
             return -1;
@@ -259,13 +268,27 @@ static int parse_specifier(struct convspec *cs, const char *fmt)
         }
         break;
 
-    case 'u':
-        if ((cs->flags & (CONVSPEC_HASH | CONVSPEC_SPACE | CONVSPEC_PLUS))
-            != 0) {
-            /* '#', ' ' and '+' are not supported for 'u' specifier. */
+    case 'U':
+    case 'O':
+        /* Deprecated alias for '%lu' and '%lo', respectively. */
+        if (cs->has_len) {
             return -1;
         }
-        /* '-' and '0' are mutually exclusive for 'u' specifier. */
+        cs->len = CONVSPEC_LONG;
+        /* Fall through. */
+    case 'u':
+    case 'o':
+        if ((cs->flags & CONVSPEC_HASH) != 0) {
+            /* '#' is not supported for 'u' or 'o' specifiers. */
+            return -1;
+        }
+    case 'X':
+    case 'x':
+        if ((cs->flags & (CONVSPEC_SPACE | CONVSPEC_PLUS)) != 0) {
+            /* '#', ' ' and '+' are not supported for these specifiers. */
+            return -1;
+        }
+        /* '-' and '0' are mutually exclusive. */
         if ((cs->flags & (CONVSPEC_MINUS | CONVSPEC_ZERO))
             == (CONVSPEC_MINUS | CONVSPEC_ZERO)) {
             return -1;
@@ -278,21 +301,13 @@ static int parse_specifier(struct convspec *cs, const char *fmt)
 
     case 'a':
     case 'A':
-    case 'D':
     case 'e':
     case 'E':
     case 'f':
     case 'F':
     case 'g':
     case 'G':
-    case 'i':
     case 'n':
-    case 'o':
-    case 'O':
-    case 'p':
-    case 'U':
-    case 'x':
-    case 'X':
         /* TODO: Implement this specifier. */
         errno = ENOSYS;
         return -1;

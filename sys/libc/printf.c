@@ -76,44 +76,44 @@ ssize_t vfprintf_impl(
 {
     int nskip;
     ssize_t nwritten = 0;
-    struct convspec convspec;
+    struct convspec cs;
 
-    while ((nskip = convspec_parse(&convspec, fmt)) > 0) {
+    while ((nskip = convspec_parse(&cs, fmt)) > 0) {
         ssize_t rc;
         void *buf = NULL;
         size_t len = 0;
 
-        if (convspec.conv == '\0') {
+        if (cs.conv == '\0') {
             /* No conversion specifier, meaning this was a string. */
             buf = (void *)fmt;
             len = nskip;
-        } else if (convspec.conv == 'c') {
+        } else if (cs.conv == 'c') {
             /* Write a single character. */
             char chr = (char)(va_arg(args, unsigned) & 0xFFU);
             buf = &chr;
             len = sizeof(chr);
-        } else if (convspec.conv == 's') {
+        } else if (cs.conv == 's') {
             /* Write a string. */
             buf = va_arg(args, char *);
             len = strlen((char *)buf);
-            if (convspec.has_prec) {
+            if (cs.has_prec) {
                 /* Precision part in the 's' conversion specifier determines
                  * the maximum number of bytes from the string to be written
                  * to the output stream. Limit the argument length to that. */
-                len = MIN(len, convspec.prec);
+                len = MIN(len, cs.prec);
             }
-        } else if (convspec.conv == 'd') {
+        } else if (cs.conv == 'd' || cs.conv == 'i' || cs.conv == 'D') {
             /* Write a signed integer. */
             intmax_t val;
-            if (convspec.len == CONVSPEC_LONG) {
+            if (cs.len == CONVSPEC_LONG) {
                 val = va_arg(args, long);
-            } else if (convspec.len == CONVSPEC_LONG_LONG) {
+            } else if (cs.len == CONVSPEC_LONG_LONG) {
                 val = va_arg(args, long long);
-            } else if (convspec.len == CONVSPEC_MAX) {
+            } else if (cs.len == CONVSPEC_MAX) {
                 val = va_arg(args, intmax_t);
-            } else if (convspec.len == CONVSPEC_SIZE) {
+            } else if (cs.len == CONVSPEC_SIZE) {
                 val = va_arg(args, ssize_t);
-            } else if (convspec.len == CONVSPEC_PTRDIFF) {
+            } else if (cs.len == CONVSPEC_PTRDIFF) {
                 val = va_arg(args, ptrdiff_t);
             } else {
                 val = va_arg(args, signed);
@@ -126,10 +126,10 @@ ssize_t vfprintf_impl(
                 conv[len++] = '0';
             } else {
                 if (val > 0) {
-                    if ((convspec.flags & CONVSPEC_PLUS) != 0) {
+                    if ((cs.flags & CONVSPEC_PLUS) != 0) {
                         /* Print plus sign before positive number. */
                         conv[len++] = '+';
-                    } else if ((convspec.flags & CONVSPEC_SPACE) != 0) {
+                    } else if ((cs.flags & CONVSPEC_SPACE) != 0) {
                         /* Print space before positive number. */
                         conv[len++] = ' ';
                     }
@@ -148,18 +148,20 @@ ssize_t vfprintf_impl(
                     conv[len++] = rev[n];
                 }
             }
-        } else if (convspec.conv == 'u') {
+        } else if (cs.conv == 'U' || cs.conv == 'O' || cs.conv == 'X'
+            || cs.conv == 'u' || cs.conv == 'o' || cs.conv == 'x'
+            || cs.conv == 'p') {
             /* Write an unsigned integer. */
             uintmax_t val;
-            if (convspec.len == CONVSPEC_LONG) {
+            if (cs.len == CONVSPEC_LONG) {
                 val = va_arg(args, unsigned long);
-            } else if (convspec.len == CONVSPEC_LONG_LONG) {
+            } else if (cs.len == CONVSPEC_LONG_LONG) {
                 val = va_arg(args, unsigned long long);
-            } else if (convspec.len == CONVSPEC_MAX) {
+            } else if (cs.len == CONVSPEC_MAX) {
                 val = va_arg(args, uintmax_t);
-            } else if (convspec.len == CONVSPEC_SIZE) {
+            } else if (cs.len == CONVSPEC_SIZE) {
                 val = va_arg(args, size_t);
-            } else if (convspec.len == CONVSPEC_PTRDIFF) {
+            } else if (cs.len == CONVSPEC_PTRDIFF) {
                 val = va_arg(args, unsigned long);
             } else {
                 val = va_arg(args, unsigned);
@@ -168,13 +170,43 @@ ssize_t vfprintf_impl(
             char conv[64];
             buf = &conv;
 
+            if (cs.conv == 'p') {
+                /* "%p" is equivalent to "%#x" or "%#lx". */
+                cs.conv = 'x';
+                cs.flags = CONVSPEC_HASH;
+                if (sizeof(void *) > sizeof(int)) {
+                    cs.len = CONVSPEC_LONG;
+                }
+                cs.width = sizeof(void *) / 2;
+            }
+
+            if ((cs.flags & CONVSPEC_HASH)
+                && (cs.conv == 'X' || cs.conv == 'x')) {
+                /* Prepend "0x" or "0X". */
+                conv[len++] = '0';
+                conv[len++] = cs.conv;
+            }
+
+            int base;
+            if (cs.conv == 'x' || cs.conv == 'X') {
+                base = 16;
+            } else if (cs.conv == 'u' || cs.conv == 'U') {
+                base = 10;
+            } else if (cs.conv == 'o' || cs.conv == 'O') {
+                base = 8;
+            }
+
+            const char lowerhex[16] = "0123456789abcdef";
+            const char upperhex[16] = "0123456789ABCDEF";
+            const char *hex = cs.conv == 'X' ? upperhex : lowerhex;
+
             if (val == 0) {
                 conv[len++] = '0';
             } else {
                 char rev[64];
                 size_t n;
-                for (n = 0; val > 0; val /= 10) {
-                    rev[n++] = (char)('0' + (val % 10));
+                for (n = 0; val > 0; val /= base) {
+                    rev[n++] = (char)(hex[val % base]);
                 }
                 while (n-- > 0) {
                     conv[len++] = rev[n];
@@ -182,8 +214,7 @@ ssize_t vfprintf_impl(
             }
         }
 
-        rc = pad(&convspec, (struct pad_opts) { .type = LEADING, .len = len },
-            &opts);
+        rc = pad(&cs, (struct pad_opts) { .type = LEADING, .len = len }, &opts);
         if (rc < 0) {
             goto end;
         }
@@ -193,8 +224,8 @@ ssize_t vfprintf_impl(
             goto end;
         }
         nwritten += rc;
-        rc = pad(&convspec, (struct pad_opts) { .type = TRAILING, .len = len },
-            &opts);
+        rc = pad(
+            &cs, (struct pad_opts) { .type = TRAILING, .len = len }, &opts);
         if (rc < 0) {
             goto end;
         }

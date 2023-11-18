@@ -42,7 +42,6 @@ static void prepare_test(struct state *state)
 
 ssize_t write(int fd, const void *buf, size_t count)
 {
-    printf("write(%d, \"%s\", %d)\n", fd, buf, count);
     g_state.write_calls++;
     strncat(g_state.write_buf, buf, count);
     g_state.write_len += count;
@@ -136,6 +135,24 @@ static void test_vfprintf_impl(void)
     assert(!strcmp(g_state.write_buf, "  42"));
     assert(g_state.write_len == 4);
     prepare_test(&g_state);
+
+    /* Test hex integers. */
+    prepare_test(&g_state);
+    rc = uut_printf("%x", 2147483647);
+    assert(rc == 8);
+    assert(!strcmp(g_state.write_buf, "7fffffff"));
+    assert(g_state.write_len == 8);
+    prepare_test(&g_state);
+    rc = uut_printf("%16X", 2147483647);
+    assert(rc == 16);
+    assert(!strcmp(g_state.write_buf, "        7FFFFFFF"));
+    assert(g_state.write_len == 16);
+    prepare_test(&g_state);
+    prepare_test(&g_state);
+    rc = uut_printf("%08x", 16);
+    assert(rc == 8);
+    assert(!strcmp(g_state.write_buf, "00000010"));
+    assert(g_state.write_len == 8);
 }
 
 int main(int argc, char **argv)
