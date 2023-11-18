@@ -40,9 +40,9 @@ static void prepare_test(struct state *state)
     memset(state, 0, sizeof(*state));
 }
 
-ssize_t write(int fildes, const void *buf, size_t count)
+ssize_t write(int fd, const void *buf, size_t count)
 {
-    // printf("write(%d, \"%s\", %d) = %d\n", fd, buf, count, count);
+    printf("write(%d, \"%s\", %d)\n", fd, buf, count);
     g_state.write_calls++;
     strncat(g_state.write_buf, buf, count);
     g_state.write_len += count;
@@ -100,6 +100,42 @@ static void test_vfprintf_impl(void)
     assert(!strcmp(g_state.write_buf, "hello"));
     assert(g_state.write_len == 5);
     assert(g_state.write_calls == 1);
+
+    /* Test signed integers. */
+    prepare_test(&g_state);
+    rc = uut_printf("%d", 2147483647);
+    assert(rc == 10);
+    assert(!strcmp(g_state.write_buf, "2147483647"));
+    assert(g_state.write_len == 10);
+    prepare_test(&g_state);
+    rc = uut_printf("%+d", 2147483647);
+    assert(rc == 11);
+    assert(!strcmp(g_state.write_buf, "+2147483647"));
+    assert(g_state.write_len == 11);
+    prepare_test(&g_state);
+    rc = uut_printf("% d", -2147483647);
+    assert(rc == 11);
+    assert(!strcmp(g_state.write_buf, "-2147483647"));
+    assert(g_state.write_len == 11);
+    prepare_test(&g_state);
+    rc = uut_printf("%4d", -42);
+    assert(rc == 4);
+    assert(!strcmp(g_state.write_buf, " -42"));
+    assert(g_state.write_len == 4);
+    prepare_test(&g_state);
+
+    /* Test unsigned integers. */
+    prepare_test(&g_state);
+    rc = uut_printf("%u", 2147483647);
+    assert(rc == 10);
+    assert(!strcmp(g_state.write_buf, "2147483647"));
+    assert(g_state.write_len == 10);
+    prepare_test(&g_state);
+    rc = uut_printf("%4u", 42);
+    assert(rc == 4);
+    assert(!strcmp(g_state.write_buf, "  42"));
+    assert(g_state.write_len == 4);
+    prepare_test(&g_state);
 }
 
 int main(int argc, char **argv)

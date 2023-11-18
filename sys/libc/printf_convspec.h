@@ -83,9 +83,9 @@ struct convspec {
 /**
  * @brief       Parses a conversion specifier.
  *
- * @param[out]  convspec  A pointer to a @ref convspec struct that will hold
- *                        the parameters for the conversion specifier.
- * @param[in]   fmt       The format string.
+ * @param[out]  cs     A pointer to a @ref convspec struct that will hold the
+ *                     parameters for the conversion specifier.
+ * @param[in]   fmt    The format string.
  *
  * @return      On error, a negative value. On success, the number of bytes to
  *              be skipped after the parsed conversion specifier. If no
@@ -93,4 +93,4 @@ struct convspec {
  *              the next conversion specifier or the NUL terminator are found
  *              (whichever comes first).
  */
-int convspec_parse(struct convspec *convspec, const char *fmt);
+int convspec_parse(struct convspec *cs, const char *fmt);

@@ -199,13 +199,13 @@ static int parse_length_modifier(struct convspec *convspec, const char *fmt)
     return rc;
 }
 
-static int parse_specifier(struct convspec *convspec, const char *fmt)
+static int parse_specifier(struct convspec *cs, const char *fmt)
 {
     switch (*fmt) {
     case '%':
         /* '%' supports no parts. */
-        if (convspec->has_prec || convspec->has_len || convspec->has_argno
-            || convspec->has_flags || convspec->has_width) {
+        if (cs->has_prec || cs->has_len || cs->has_argno || cs->has_flags
+            || cs->has_width) {
             return -1;
         }
         break;
@@ -213,53 +213,65 @@ static int parse_specifier(struct convspec *convspec, const char *fmt)
     case 'c':
         /* Check supported parts ('c' only supports argno, flags, len and
          * width). */
-        if (convspec->has_prec) {
+        if (cs->has_prec) {
             return -1;
         }
         /* Check supported flags ('c' only supports '-'). */
-        if ((convspec->flags & CONVSPEC_HASH) != 0
-            || (convspec->flags & CONVSPEC_SPACE) != 0
-            || (convspec->flags & CONVSPEC_PLUS) != 0
-            || (convspec->flags & CONVSPEC_ZERO) != 0) {
+        if (cs->flags & ~CONVSPEC_MINUS) {
             return -1;
         }
         /* Check supported modifiers ('c' only supports 'l' or none). */
-        if (convspec->len != 0 && convspec->len != CONVSPEC_LONG) {
+        if (cs->len != 0 && cs->len != CONVSPEC_LONG) {
             return -1;
         }
         break;
 
     case 's':
         /* Check supported flags ('s' only supports '-'). */
-        if ((convspec->flags & CONVSPEC_HASH) != 0
-            || (convspec->flags & CONVSPEC_SPACE) != 0
-            || (convspec->flags & CONVSPEC_PLUS) != 0
-            || (convspec->flags & CONVSPEC_ZERO) != 0) {
+        if (cs->flags & ~CONVSPEC_MINUS) {
             return -1;
         }
         /* Check supported modifiers ('s' only supports 'l' or none). */
-        if (convspec->len != 0 && convspec->len != CONVSPEC_LONG) {
+        if (cs->len != 0 && cs->len != CONVSPEC_LONG) {
             return -1;
         }
         break;
 
     case 'd':
-        if ((convspec->flags & CONVSPEC_HASH) != 0) {
+        if (cs->flags & CONVSPEC_HASH) {
             /* '#' is not supported for 'd' specifier. */
             return -1;
         }
-        if (((convspec->flags & CONVSPEC_SPACE) != 0)
-            && (convspec->flags & CONVSPEC_PLUS) != 0) {
-            /* ' ' and '+' are mutually exclusive for 'd' specifier. */
+
+        /* ' ' and '+' are mutually exclusive for 'd' specifier. */
+        if ((cs->flags & (CONVSPEC_SPACE | CONVSPEC_PLUS))
+            == (CONVSPEC_SPACE | CONVSPEC_PLUS)) {
             return -1;
         }
-        if (((convspec->flags & CONVSPEC_MINUS) != 0)
-            && (convspec->flags & CONVSPEC_ZERO) != 0) {
-            /* '-' and '0' are mutually exclusive for 's' specifier. */
+        /* '-' and '0' are mutually exclusive for 'd' specifier. */
+        if ((cs->flags & (CONVSPEC_MINUS | CONVSPEC_ZERO))
+            == (CONVSPEC_MINUS | CONVSPEC_ZERO)) {
             return -1;
         }
         /* Check supported modifiers ('L' is not supported). */
-        if (convspec->len != 0 && convspec->len == CONVSPEC_LONG_DOUBLE) {
+        if (cs->len == CONVSPEC_LONG_DOUBLE) {
+            return -1;
+        }
+        break;
+
+    case 'u':
+        if ((cs->flags & (CONVSPEC_HASH | CONVSPEC_SPACE | CONVSPEC_PLUS))
+            != 0) {
+            /* '#', ' ' and '+' are not supported for 'u' specifier. */
+            return -1;
+        }
+        /* '-' and '0' are mutually exclusive for 'u' specifier. */
+        if ((cs->flags & (CONVSPEC_MINUS | CONVSPEC_ZERO))
+            == (CONVSPEC_MINUS | CONVSPEC_ZERO)) {
+            return -1;
+        }
+        /* Check supported modifiers ('L' is not supported). */
+        if (cs->len == CONVSPEC_LONG_DOUBLE) {
             return -1;
         }
         break;
@@ -278,7 +290,6 @@ static int parse_specifier(struct convspec *convspec, const char *fmt)
     case 'o':
     case 'O':
     case 'p':
-    case 'u':
     case 'U':
     case 'x':
     case 'X':
@@ -291,31 +302,31 @@ static int parse_specifier(struct convspec *convspec, const char *fmt)
         return -1;
     }
 
-    convspec->conv = *fmt;
+    cs->conv = *fmt;
     return 1;
 }
 
-int convspec_parse(struct convspec *convspec, const char *fmt)
+int convspec_parse(struct convspec *cs, const char *fmt)
 {
     const char *fmt_initial = fmt;
     int rc = 0;
 
-    convspec->argno = 0;
-    convspec->has_argno = 0;
+    cs->argno = 0;
+    cs->has_argno = 0;
 
-    convspec->flags = 0;
-    convspec->has_flags = 0;
+    cs->flags = 0;
+    cs->has_flags = 0;
 
-    convspec->width = 0;
-    convspec->has_width = 0;
+    cs->width = 0;
+    cs->has_width = 0;
 
-    convspec->prec = 0;
-    convspec->has_prec = 0;
+    cs->prec = 0;
+    cs->has_prec = 0;
 
-    convspec->len = 0;
-    convspec->has_len = 0;
+    cs->len = 0;
+    cs->has_len = 0;
 
-    convspec->conv = '\0';
+    cs->conv = '\0';
 
     /* Skip until we find a conversion specifier or the end of the string. */
     if (*fmt != '%') {
@@ -328,37 +339,37 @@ int convspec_parse(struct convspec *convspec, const char *fmt)
     /* Skip initial '%' character. */
     fmt++;
 
-    rc = parse_argno(convspec, fmt);
+    rc = parse_argno(cs, fmt);
     if (rc < 0) {
         return rc;
     }
     fmt += rc;
 
-    rc = parse_flags(convspec, fmt);
+    rc = parse_flags(cs, fmt);
     if (rc < 0) {
         return rc;
     }
     fmt += rc;
 
-    rc = parse_width(convspec, fmt);
+    rc = parse_width(cs, fmt);
     if (rc < 0) {
         return rc;
     }
     fmt += rc;
 
-    rc = parse_precision(convspec, fmt);
+    rc = parse_precision(cs, fmt);
     if (rc < 0) {
         return rc;
     }
     fmt += rc;
 
-    rc = parse_length_modifier(convspec, fmt);
+    rc = parse_length_modifier(cs, fmt);
     if (rc < 0) {
         return rc;
     }
     fmt += rc;
 
-    rc = parse_specifier(convspec, fmt);
+    rc = parse_specifier(cs, fmt);
     if (rc < 0) {
         return rc;
     }

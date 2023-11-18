@@ -112,11 +112,11 @@ ssize_t vfprintf_impl(
             } else if (convspec.len == CONVSPEC_MAX) {
                 val = va_arg(args, intmax_t);
             } else if (convspec.len == CONVSPEC_SIZE) {
-                val = va_arg(args, size_t);
+                val = va_arg(args, ssize_t);
             } else if (convspec.len == CONVSPEC_PTRDIFF) {
                 val = va_arg(args, ptrdiff_t);
             } else {
-                val = va_arg(args, int);
+                val = va_arg(args, signed);
             }
 
             char conv[64];
@@ -124,29 +124,62 @@ ssize_t vfprintf_impl(
 
             if (val == 0) {
                 conv[len++] = '0';
-            } else if (val > 0) {
-                if ((convspec.flags & CONVSPEC_PLUS) != 0) {
-                    /* Print plus sign before positive number. */
-                    conv[len++] = '+';
-                } else if ((convspec.flags & CONVSPEC_SPACE) != 0) {
-                    /* Print space before positive number. */
-                    conv[len++] = ' ';
-                }
             } else {
-                /* Number is negative */
-                conv[len++] = '-';
-                val = -val;
+                if (val > 0) {
+                    if ((convspec.flags & CONVSPEC_PLUS) != 0) {
+                        /* Print plus sign before positive number. */
+                        conv[len++] = '+';
+                    } else if ((convspec.flags & CONVSPEC_SPACE) != 0) {
+                        /* Print space before positive number. */
+                        conv[len++] = ' ';
+                    }
+                } else {
+                    /* Number is negative */
+                    conv[len++] = '-';
+                    val = -val;
+                }
+
+                char rev[64];
+                size_t n;
+                for (n = 0; val > 0; val /= 10) {
+                    rev[n++] = (char)('0' + (val % 10));
+                }
+                while (n-- > 0) {
+                    conv[len++] = rev[n];
+                }
+            }
+        } else if (convspec.conv == 'u') {
+            /* Write an unsigned integer. */
+            uintmax_t val;
+            if (convspec.len == CONVSPEC_LONG) {
+                val = va_arg(args, unsigned long);
+            } else if (convspec.len == CONVSPEC_LONG_LONG) {
+                val = va_arg(args, unsigned long long);
+            } else if (convspec.len == CONVSPEC_MAX) {
+                val = va_arg(args, uintmax_t);
+            } else if (convspec.len == CONVSPEC_SIZE) {
+                val = va_arg(args, size_t);
+            } else if (convspec.len == CONVSPEC_PTRDIFF) {
+                val = va_arg(args, unsigned long);
+            } else {
+                val = va_arg(args, unsigned);
             }
 
-            char rev[64];
-            size_t n;
-            for (n = 0; val > 0; val /= 10) {
-                rev[n++] = (char)('0' + (val % 10));
+            char conv[64];
+            buf = &conv;
+
+            if (val == 0) {
+                conv[len++] = '0';
+            } else {
+                char rev[64];
+                size_t n;
+                for (n = 0; val > 0; val /= 10) {
+                    rev[n++] = (char)('0' + (val % 10));
+                }
+                while (n-- > 0) {
+                    conv[len++] = rev[n];
+                }
             }
-            while (n-- > 0) {
-                conv[len++] = rev[n];
-            }
-            conv[len] = '\0';
         }
 
         rc = pad(&convspec, (struct pad_opts) { .type = LEADING, .len = len },

@@ -22,232 +22,362 @@
 
 #include "../../sys/libc/printf_convspec.c"
 
-/* Used to fill convspec struct for testing. */
-static const int k_magic_fill = 0xCC;
-
 /* Test state. */
 struct state {
     /* Return value of the convspec_parse() function. */
     int rc;
     /* Struct containing information about the parsed conversion specifier. */
-    struct convspec convspec;
+    struct convspec cs;
 };
 
 /* Prepares a single test to run. */
-static void prepare_test(struct state *state)
+static void prepare_test(struct state *s)
 {
-    assert(state != NULL);
-    memset(state, k_magic_fill, sizeof(*state));
+    assert(s != NULL);
+    /* Fill with a sentinel value so we catch improper initializations. */
+    memset(s, 0xcc, sizeof(*s));
 }
 
 /* Test that parsing a format string skips until a conversion specifier is
  * found. */
 static void test_parse_no_spec(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "hello, %s!");
-    assert(state.rc == strlen("hello, "));
-    assert(state.convspec.argno == 0);
-    assert(state.convspec.flags == 0);
-    assert(state.convspec.width == 0);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == 0);
-    assert(state.convspec.conv == '\0');
+    s.rc = convspec_parse(&s.cs, "hello, %s!");
+    assert(s.rc == strlen("hello, "));
+    assert(s.cs.argno == 0);
+    assert(s.cs.flags == 0);
+    assert(s.cs.width == 0);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == 0);
+    assert(s.cs.conv == '\0');
 
-    state.rc = convspec_parse(&state.convspec, "hello, world!");
-    assert(state.rc == strlen("hello, world!"));
-    assert(state.convspec.argno == 0);
-    assert(state.convspec.flags == 0);
-    assert(state.convspec.width == 0);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == 0);
-    assert(state.convspec.conv == '\0');
+    s.rc = convspec_parse(&s.cs, "hello, world!");
+    assert(s.rc == strlen("hello, world!"));
+    assert(s.cs.argno == 0);
+    assert(s.cs.flags == 0);
+    assert(s.cs.width == 0);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == 0);
+    assert(s.cs.conv == '\0');
 }
 
 /* Test that parsing the most basic conversion specifier syntax works. */
 static void test_parse_simple(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "%c");
-    assert(state.rc == strlen("%c"));
-    assert(state.convspec.argno == 0);
-    assert(state.convspec.flags == 0);
-    assert(state.convspec.width == 0);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == 0);
-    assert(state.convspec.conv == 'c');
+    s.rc = convspec_parse(&s.cs, "%c");
+    assert(s.rc == strlen("%c"));
+    assert(s.cs.argno == 0);
+    assert(s.cs.flags == 0);
+    assert(s.cs.width == 0);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == 0);
+    assert(s.cs.conv == 'c');
 }
 
 /* Test that parsing length modifiers works. */
 static void test_parse_length_modifier(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "%lc");
-    assert(state.rc == strlen("%lc"));
-    assert(state.convspec.argno == 0);
-    assert(state.convspec.flags == 0);
-    assert(state.convspec.width == 0);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == CONVSPEC_LONG);
-    assert(state.convspec.conv == 'c');
+    s.rc = convspec_parse(&s.cs, "%lc");
+    assert(s.rc == strlen("%lc"));
+    assert(s.cs.argno == 0);
+    assert(s.cs.flags == 0);
+    assert(s.cs.width == 0);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == CONVSPEC_LONG);
+    assert(s.cs.conv == 'c');
 }
 
 /* Test that parsing width works. */
 static void test_parse_width(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "%-1337c");
-    assert(state.rc == strlen("%-1337c"));
-    assert(state.convspec.argno == 0);
-    assert(state.convspec.flags == CONVSPEC_MINUS);
-    assert(state.convspec.width == 1337);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == 0);
-    assert(state.convspec.conv == 'c');
+    s.rc = convspec_parse(&s.cs, "%-1337c");
+    assert(s.rc == strlen("%-1337c"));
+    assert(s.cs.argno == 0);
+    assert(s.cs.flags == CONVSPEC_MINUS);
+    assert(s.cs.width == 1337);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == 0);
+    assert(s.cs.conv == 'c');
 }
 
 /* Test that parsing argno works. */
 static void test_parse_argno(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "%1337$c");
-    assert(state.rc == strlen("%1337$c"));
-    assert(state.convspec.argno == 1337);
-    assert(state.convspec.flags == 0);
-    assert(state.convspec.width == 0);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == 0);
-    assert(state.convspec.conv == 'c');
+    s.rc = convspec_parse(&s.cs, "%1337$c");
+    assert(s.rc == strlen("%1337$c"));
+    assert(s.cs.argno == 1337);
+    assert(s.cs.flags == 0);
+    assert(s.cs.width == 0);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == 0);
+    assert(s.cs.conv == 'c');
 }
 
 /* Test that parsing the full %% specifier works. */
 static void test_parse_full_percent(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "%%");
-    assert(state.rc == strlen("%%"));
-    assert(state.convspec.argno == 0);
-    assert(state.convspec.flags == 0);
-    assert(state.convspec.width == 0);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == 0);
-    assert(state.convspec.conv == '%');
+    s.rc = convspec_parse(&s.cs, "%%");
+    assert(s.rc == strlen("%%"));
+    assert(s.cs.argno == 0);
+    assert(s.cs.flags == 0);
+    assert(s.cs.width == 0);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == 0);
+    assert(s.cs.conv == '%');
 
     /* The '%' specifiers supports no argno syntax. */
-    state.rc = convspec_parse(&state.convspec, "%1$%");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1$%");
+    assert(s.rc < 0);
 
     /* The '%' specifiers supports no flags syntax. */
-    state.rc = convspec_parse(&state.convspec, "%+%");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%+%");
+    assert(s.rc < 0);
 
     /* The '%' specifiers supports no width syntax. */
-    state.rc = convspec_parse(&state.convspec, "%4%");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%4%");
+    assert(s.rc < 0);
 
     /* The '%' specifiers supports no precision syntax. */
-    state.rc = convspec_parse(&state.convspec, "%.4%");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%.4%");
+    assert(s.rc < 0);
 
     /* The '%' specifiers supports no length modifier syntax. */
-    state.rc = convspec_parse(&state.convspec, "%l%");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%l%");
+    assert(s.rc < 0);
 }
 
 /* Test that parsing the full %c specifier works. */
 static void test_parse_full_char(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "%1337$-42lc");
-    assert(state.rc == strlen("%1337$-42lc"));
-    assert(state.convspec.argno == 1337);
-    assert(state.convspec.flags == CONVSPEC_MINUS);
-    assert(state.convspec.width == 42);
-    assert(state.convspec.prec == 0);
-    assert(state.convspec.len == CONVSPEC_LONG);
-    assert(state.convspec.conv == 'c');
+    s.rc = convspec_parse(&s.cs, "%1337$-42lc");
+    assert(s.rc == strlen("%1337$-42lc"));
+    assert(s.cs.argno == 1337);
+    assert(s.cs.flags == CONVSPEC_MINUS);
+    assert(s.cs.width == 42);
+    assert(s.cs.prec == 0);
+    assert(s.cs.len == CONVSPEC_LONG);
+    assert(s.cs.conv == 'c');
 
     /* The 'c' specifier does not support the '#', ' ', '+' or '0' flags. */
-    state.rc = convspec_parse(&state.convspec, "%1337$#42c");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%1337$ 42c");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%1337$+42c");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%1337$042c");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$#42c");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$ 42c");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$+42c");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$042c");
+    assert(s.rc < 0);
 
     /* The 'c' specifier supports no precision. */
-    state.rc = convspec_parse(&state.convspec, "%.2c");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%.2c");
+    assert(s.rc < 0);
 
     /* The 'c' specifier only supports 'l' length modifier (or none). */
-    state.rc = convspec_parse(&state.convspec, "%hc");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%hhc");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%jc");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%zc");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%tc");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%Lc");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%hc");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%hhc");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%jc");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%zc");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%tc");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%Lc");
+    assert(s.rc < 0);
 }
 
 /* Test that parsing the full %s specifier works. */
 static void test_parse_full_string(void)
 {
-    struct state state;
-    prepare_test(&state);
+    struct state s;
+    prepare_test(&s);
 
-    state.rc = convspec_parse(&state.convspec, "%1337$-42.512ls");
-    assert(state.rc == strlen("%1337$-42.512ls"));
-    assert(state.convspec.argno == 1337);
-    assert(state.convspec.flags == CONVSPEC_MINUS);
-    assert(state.convspec.width == 42);
-    assert(state.convspec.prec == 512);
-    assert(state.convspec.len == CONVSPEC_LONG);
-    assert(state.convspec.conv == 's');
+    s.rc = convspec_parse(&s.cs, "%1337$-42.512ls");
+    assert(s.rc == strlen("%1337$-42.512ls"));
+    assert(s.cs.argno == 1337);
+    assert(s.cs.flags == CONVSPEC_MINUS);
+    assert(s.cs.width == 42);
+    assert(s.cs.prec == 512);
+    assert(s.cs.len == CONVSPEC_LONG);
+    assert(s.cs.conv == 's');
 
     /* The 's' specifier does not support the '#', ' ', '+' or '0' flags. */
-    state.rc = convspec_parse(&state.convspec, "%1337$#42s");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%1337$ 42s");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%1337$+42s");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%1337$042s");
-    assert(state.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$#42s");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$ 42s");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$+42s");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%1337$042s");
+    assert(s.rc < 0);
 
-    /* The 'c' specifier only supports 'l' length modifier (or none). */
-    state.rc = convspec_parse(&state.convspec, "%hs");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%hhs");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%js");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%zs");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%ts");
-    assert(state.rc < 0);
-    state.rc = convspec_parse(&state.convspec, "%Ls");
-    assert(state.rc < 0);
+    /* The 's' specifier only supports 'l' length modifier (or none). */
+    s.rc = convspec_parse(&s.cs, "%hs");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%hhs");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%js");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%zs");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%ts");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%Ls");
+    assert(s.rc < 0);
+}
+
+/* Test that parsing the full %d specifier works. */
+static void test_parse_full_signed(void)
+{
+    struct state s;
+    prepare_test(&s);
+
+    s.rc = convspec_parse(&s.cs, "%1337$-42.512hhd");
+    assert(s.rc == strlen("%1337$-42.512hhd"));
+    assert(s.cs.argno == 1337);
+    assert(s.cs.flags == CONVSPEC_MINUS);
+    assert(s.cs.width == 42);
+    assert(s.cs.prec == 512);
+    assert(s.cs.len == CONVSPEC_CHAR);
+    assert(s.cs.conv == 'd');
+
+    /* The 'd' specifier does not support '#'. */
+    s.rc = convspec_parse(&s.cs, "%#d");
+    assert(s.rc < 0);
+    /* The 'd' specifier does not support ' ' and '+' simultaneously. */
+    s.rc = convspec_parse(&s.cs, "% +d");
+    assert(s.rc < 0);
+    /* The 'd' specifier does not support '-' and '0' simultaneously. */
+    s.rc = convspec_parse(&s.cs, "%-0d");
+    assert(s.rc < 0);
+    /* The 'd' specifier supports ' ' and '-' simultaneously. */
+    s.rc = convspec_parse(&s.cs, "% -d");
+    assert(s.rc == strlen("% -d"));
+    assert(s.cs.flags == (CONVSPEC_SPACE | CONVSPEC_MINUS));
+    /* The 'd' specifier supports '+' and '0' simultaneously. */
+    s.rc = convspec_parse(&s.cs, "%+0d");
+    assert(s.rc == strlen("%+0d"));
+    assert(s.cs.flags == (CONVSPEC_PLUS | CONVSPEC_ZERO));
+
+    /* The 'd' specifier supports all length modifiers but 'L'. */
+    s.rc = convspec_parse(&s.cs, "%hhd");
+    assert(s.rc == strlen("%hhd"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_CHAR);
+    s.rc = convspec_parse(&s.cs, "%hd");
+    assert(s.rc == strlen("%hd"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_SHORT);
+    s.rc = convspec_parse(&s.cs, "%d");
+    assert(s.rc == strlen("%d"));
+    assert(s.cs.has_len == 0);
+    assert(s.cs.len == 0);
+    s.rc = convspec_parse(&s.cs, "%ld");
+    assert(s.rc == strlen("%ld"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_LONG);
+    s.rc = convspec_parse(&s.cs, "%lld");
+    assert(s.rc == strlen("%lld"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_LONG_LONG);
+    s.rc = convspec_parse(&s.cs, "%jd");
+    assert(s.rc == strlen("%jd"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_MAX);
+    s.rc = convspec_parse(&s.cs, "%td");
+    assert(s.rc == strlen("%td"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_PTRDIFF);
+    s.rc = convspec_parse(&s.cs, "%zd");
+    assert(s.rc == strlen("%zd"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_SIZE);
+    s.rc = convspec_parse(&s.cs, "%Ld");
+    assert(s.rc < 0);
+}
+
+/* Test that parsing the full %u specifier works. */
+static void test_parse_full_unsigned(void)
+{
+    struct state s;
+    prepare_test(&s);
+
+    s.rc = convspec_parse(&s.cs, "%1337$-42.512hhu");
+    assert(s.rc == strlen("%1337$-42.512hhu"));
+    assert(s.cs.argno == 1337);
+    assert(s.cs.flags == CONVSPEC_MINUS);
+    assert(s.cs.width == 42);
+    assert(s.cs.prec == 512);
+    assert(s.cs.len == CONVSPEC_CHAR);
+    assert(s.cs.conv == 'u');
+
+    /* The 'd' specifier does not support '#', ' ' or '+'. */
+    s.rc = convspec_parse(&s.cs, "%#u");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "% u");
+    assert(s.rc < 0);
+    s.rc = convspec_parse(&s.cs, "%+u");
+    assert(s.rc < 0);
+    /* The 'd' specifier does not support '-' and '0' simultaneously. */
+    s.rc = convspec_parse(&s.cs, "%-0u");
+    assert(s.rc < 0);
+    /* The 'd' specifier supports all length modifiers but 'L'. */
+    s.rc = convspec_parse(&s.cs, "%hhu");
+    assert(s.rc == strlen("%hhu"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_CHAR);
+    s.rc = convspec_parse(&s.cs, "%hu");
+    assert(s.rc == strlen("%hu"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_SHORT);
+    s.rc = convspec_parse(&s.cs, "%u");
+    assert(s.rc == strlen("%u"));
+    assert(s.cs.has_len == 0);
+    assert(s.cs.len == 0);
+    s.rc = convspec_parse(&s.cs, "%lu");
+    assert(s.rc == strlen("%lu"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_LONG);
+    s.rc = convspec_parse(&s.cs, "%llu");
+    assert(s.rc == strlen("%llu"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_LONG_LONG);
+    s.rc = convspec_parse(&s.cs, "%ju");
+    assert(s.rc == strlen("%ju"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_MAX);
+    s.rc = convspec_parse(&s.cs, "%tu");
+    assert(s.rc == strlen("%tu"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_PTRDIFF);
+    s.rc = convspec_parse(&s.cs, "%zu");
+    assert(s.rc == strlen("%zu"));
+    assert(s.cs.has_len == 1);
+    assert(s.cs.len == CONVSPEC_SIZE);
+    s.rc = convspec_parse(&s.cs, "%Lu");
+    assert(s.rc < 0);
 }
 
 int main(int argc, char **argv)
@@ -262,6 +392,8 @@ int main(int argc, char **argv)
     test_parse_full_percent();
     test_parse_full_char();
     test_parse_full_string();
+    test_parse_full_signed();
+    test_parse_full_unsigned();
 
     return 0;
 }
