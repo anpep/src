@@ -25,7 +25,6 @@ CFLAGS := \
 	-std=c99 -fprofile-arcs -ftest-coverage \
 	-fsanitize=undefined -fno-sanitize=signed-integer-overflow \
 	-Wall -Wextra -Wpedantic -pedantic -Wno-unused-variable -Wno-unused-parameter \
-	-I../include \
 	-D_TEST
 
 HEADERS := $(wildcard */*.h *.h)
