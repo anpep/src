@@ -1,0 +1,2 @@
+#!/bin/sh
+qemu-system-${ARCH} -machine virt -bios none -kernel sys/boot.elf -serial mon:stdio -nographic

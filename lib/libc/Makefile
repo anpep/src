@@ -18,28 +18,36 @@
 CLANG_FORMAT ?= clang-format
 CLANG_TIDY ?= clang-tidy
 CC ?= cc
+AR ?= ar
 
 CLANG_FORMAT_FLAGS ?= -style file -Werror
-CFLAGS := \
-	-std=c99 -fprofile-arcs -ftest-coverage \
-	-fsanitize=undefined -fno-sanitize=signed-integer-overflow \
-	-Wall -Wextra -Wpedantic -pedantic -Wno-unused-variable -Wno-unused-parameter -Wno-sign-compare \
-	-D_TEST
+COMMON_CFLAGS := \
+	-std=c99 \
+	-ffreestanding -fno-builtin -nostdlib -nostdinc \
+	-Wall -Wextra -Wpedantic -pedantic -Wno-unused-variable -Wno-unused-parameter \
+	-I../../include
 
 HEADERS := $(wildcard */*.h *.h)
-SOURCES := $(wildcard */*.c *.c)
-BINARIES := $(patsubst %.c,%,${SOURCES})
+SOURCES := $(wildcard */*.S *.S) $(wildcard */*.c *.c)
+OBJECTS := $(patsubst %.S,%.o,$(patsubst %.c,%.o,${SOURCES}))
 
-all: test
+ARCH_PATH := ../../sys/arch/${ARCH}
+-include ${ARCH_PATH}/Makefile
 
-test: ${BINARIES}
-	for test in $^ ; do ./$$test||exit 1; done
+CFLAGS := ${ARCH_CFLAGS} ${COMMON_CFLAGS}
+
+export TARGET := ../libc.a
+
+all: ${TARGET}
+
+${TARGET}: ${OBJECTS}
+	${AR} rcs $@ $^
 
 clean:
-	${RM} ${BINARIES} *.gcno *.gcda *.gcov
+	${RM} ${TARGET} ${OBJECTS}
 
 lint:
 	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES}||exit 1
-	${CLANG_TIDY} ${CLANG_TIDY_FLAGS} ${HEADERS} ${SOURCES} -- ${CFLAGS}||exit 1
+	${CLANG_TIDY} ${CLANG_TIDY_FLAGS} ${HEADERS} ${SOURCES} -- ${COMMON_CFLAGS}||exit 1
 
 .PHONY: all clean lint

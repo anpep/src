@@ -14,29 +14,29 @@
  * You should have received a copy of the GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+ENTRY(start);
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+. = 0x80000000;
 
-int putchar(int val)
-{
-    ssize_t rc;
-    rc = write(0, &val, 1);
-    if (rc < 0) {
-        return (int)rc;
+SECTIONS {
+    .text : ALIGN(4K) {
+        *(.text);
     }
-    return 0;
-}
-
-int puts(const char *str)
-{
-    ssize_t rc;
-    rc = write(0, str, strlen(str));
-    if (rc < 0) {
-        errno = (int)rc;
-        return EOF;
+    .bss : ALIGN(4K) {
+        PROVIDE(bss_start = .);
+        *(.bss);
+        . += 4096;
+        PROVIDE(stack_top = .);
+        . += 4096;
+        PROVIDE(global_pointer = .);
+        PROVIDE(bss_end = .);
     }
-    return 0;
+    .rodata : ALIGN(4K) {
+        *(.rodata);
+    }
+    .data : ALIGN(4K) {
+        *(.data);
+        PROVIDE(data_end = .);
+    }
 }

@@ -91,3 +91,8 @@ unsigned long int strtoul(
  */
 unsigned long long int strtoull(
     const char *restrict nptr, char **restrict endptr, int base);
+
+/**
+ * @brief      Aborts the execution of the program.
+ */
+void abort(void);

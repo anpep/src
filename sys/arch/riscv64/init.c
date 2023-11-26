@@ -15,28 +15,16 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
-int putchar(int val)
+ssize_t write(int fd, const void *buf, size_t count)
 {
-    ssize_t rc;
-    rc = write(0, &val, 1);
-    if (rc < 0) {
-        return (int)rc;
+    uint8_t *uart = (uint8_t *)0x10000000;
+    for (size_t i = 0; i < count; i++) {
+        *uart = ((uint8_t *)buf)[i];
     }
-    return 0;
+    return (ssize_t)count;
 }
 
-int puts(const char *str)
-{
-    ssize_t rc;
-    rc = write(0, str, strlen(str));
-    if (rc < 0) {
-        errno = (int)rc;
-        return EOF;
-    }
-    return 0;
-}
+void init(void) { printf("Hello, world!\n"); }

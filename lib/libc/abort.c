@@ -15,28 +15,9 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <stdlib.h>
 
-int putchar(int val)
+void __attribute__((noreturn)) abort(void)
 {
-    ssize_t rc;
-    rc = write(0, &val, 1);
-    if (rc < 0) {
-        return (int)rc;
-    }
-    return 0;
-}
-
-int puts(const char *str)
-{
-    ssize_t rc;
-    rc = write(0, str, strlen(str));
-    if (rc < 0) {
-        errno = (int)rc;
-        return EOF;
-    }
-    return 0;
+    for (;;) { }
 }

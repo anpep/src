@@ -15,29 +15,27 @@
 ## this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-CLANG_FORMAT ?= clang-format
-CLANG_TIDY ?= clang-tidy
-CC ?= cc
+TARGETS := libc
 
-CLANG_FORMAT_FLAGS ?= -style file -Werror
-CLANG_TIDY_FLAGS ?= -header-filter=.* -system-headers
-CFLAGS := \
-	-std=c99 \
-	-ffreestanding -fno-builtin -nostdlib -nostdinc \
-	-Wall -Wextra -Wpedantic -pedantic -Wno-unused-variable -Wno-unused-parameter \
-	-I../include
+.PHONY: all
+all: ${TARGETS}
+.PHONY: clean $(addprefix clean_,${TARGETS})
+clean: $(addprefix clean_,${TARGETS})
 
-HEADERS := $(wildcard */*.h *.h)
-SOURCES := $(wildcard */*.c *.c)
-OBJECTS := $(patsubst %.c,%.o,${SOURCES})
+.PHONY: lint $(addprefix lint_,${TARGETS})
+lint: $(addprefix lint_,${TARGETS})
 
-all: ${OBJECTS}
+FORCE: ;
 
-clean:
-	${RM} ${OBJECTS}
+define target_template
+${1}: FORCE
+	@${MAKE} -C ${1}
 
-lint:
-	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES}||exit 1
-	${CLANG_TIDY} ${CLANG_TIDY_FLAGS} ${HEADERS} ${SOURCES} -- ${CFLAGS}||exit 1
+clean_${1}: FORCE
+	@${MAKE} -C ${1} clean
 
-.PHONY: all clean lint
+lint_${1}: FORCE
+	@${MAKE} -C ${1} lint
+endef
+
+$(foreach target,${TARGETS},$(eval $(call target_template,${target})))
