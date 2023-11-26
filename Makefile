@@ -15,7 +15,7 @@
 ## this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-TARGETS := sys sys_test
+TARGETS := lib lib_test
 
 .PHONY: mkcompdb all
 all: mkcompdb ${TARGETS}

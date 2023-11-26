@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../sys/libc/printf_convspec.c"
+#include "../../lib/libc/printf_convspec.c"
 
 /* Test state. */
 struct state {

@@ -218,7 +218,7 @@ int vprintf(const char *restrict fmt, va_list args)
         });
 }
 
-int uut_printf(const char *restrict fmt, ...)
+int printf(const char *restrict fmt, ...)
 {
     va_list args;
     int rc;

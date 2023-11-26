@@ -31,7 +31,7 @@
 #undef strtoul
 #undef strtoull
 
-#include "../../sys/libc/strtoint.c"
+#include "../../lib/libc/strtoint.c"
 
 static void test_strtol(void)
 {

@@ -20,23 +20,21 @@ CLANG_TIDY ?= clang-tidy
 CC ?= cc
 
 CLANG_FORMAT_FLAGS ?= -style file -Werror
-CLANG_TIDY_FLAGS ?= -header-filter=.*
+CLANG_TIDY_FLAGS ?= -header-filter=.* -system-headers
 CFLAGS := \
-	-std=c99 -fprofile-arcs -ftest-coverage \
-	-Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter \
-	-D_TEST
+	-std=c99 \
+	-ffreestanding -fno-builtin -nostdlib -nostdinc \
+	-Wall -Wextra -Wpedantic -pedantic -Wno-unused-variable -Wno-unused-parameter \
+	-I../include
 
 HEADERS := $(wildcard */*.h *.h)
 SOURCES := $(wildcard */*.c *.c)
-BINARIES := $(patsubst %.c,%,${SOURCES})
+OBJECTS := $(patsubst %.c,%.o,${SOURCES})
 
-all: test
-
-test: ${BINARIES}
-	for test in $^ ; do ./$$test||exit 1; done
+all: ${OBJECTS}
 
 clean:
-	${RM} ${BINARIES} *.gcno *.gcda *.gcov
+	${RM} ${OBJECTS}
 
 lint:
 	${CLANG_FORMAT} ${CLANG_FORMAT_FLAGS} --dry-run ${HEADERS} ${SOURCES}||exit 1

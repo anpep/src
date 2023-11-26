@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../sys/libc/printf_convspec.c"
+#include "../../lib/libc/printf_convspec.c"
 
 #define printf uut_printf
 #define vprintf uut_vprintf
-#include "../../sys/libc/printf.c"
+#include "../../lib/libc/printf.c"
 #undef printf
 #undef vprintf
 
