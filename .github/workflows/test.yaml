@@ -14,7 +14,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@main
-    - name: Run system tests
-      run: make sys_test
+    - name: Run library tests
+      run: make lib_test
       env:
         CC: ${{ matrix.cc }}
