@@ -15,31 +15,16 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.section .text
+#pragma once
 
-/* Disable compressed instructions. */
-.option norvc
+#include <stdint.h>
 
-.type _start, @function
-.global _start
-_start:
-    .cfi_startproc
-    .cfi_undefined ra
+struct regs {
+    uint64_t t0, t1, t2, t3, t4, t5, t6;
+    uint64_t s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
+    uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
+    uint64_t zero, ra, sp, gp, tp;
+};
 
-.option push
-.option norelax
-    /* We don't want linker relaxation to happen here because relaxation emits
-     * shorter instructions with addresses relative to the global pointer.
-     * Since the GP is still uninitialized, this behavior is undesirable! */
-    la gp, __global_pointer$
-.option pop
-
-    /* Reset SATP. */
-    csrw satp, zero
-
-    /* Set up the stack. */
-    la sp, __stack_top
-    add s0, sp, zero
-    jal zero, main
-    .cfi_endproc
-.end
+int regs_save(struct regs *);
+int regs_print(const struct regs *);

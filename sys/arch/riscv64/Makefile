@@ -21,7 +21,7 @@ export AS := ${ARCH_PREFIX}as
 export LD := ${ARCH_PREFIX}gcc
 export AR := ${ARCH_PREFIX}ar
 
-export ARCH_CFLAGS := -mcmodel=medany
+export ARCH_CFLAGS := -ggdb -mcmodel=medany
 export ARCH_LDFLAGS := -T${ARCH_PATH}/link.lds
 
 export ARCH_HEADERS := $(wildcard ${ARCH_PATH}/*/*.h ${ARCH_PATH}/*.h)

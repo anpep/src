@@ -49,7 +49,7 @@ def _find_targets() -> list:
 def _get_cmd(target_name: str) -> callable:
 	with open(os.path.join(root_path, target_name, "Makefile")) as mkfile:
 		v = _find_mkfile_variables(mkfile.read())
-		base_cmd = " ".join((v.get("CC", "cc"), v.get("CFLAGS", ""))).strip()
+		base_cmd = " ".join((v.get("CC", "cc"), v.get("COMMON_CFLAGS", ""))).strip()
 		return lambda file_path: " ".join((
 			base_cmd,
 			"-c", file_path,

@@ -17,6 +17,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <sys/panic.h>
 
 ssize_t write(int fd, const void *buf, size_t count)
 {
@@ -27,4 +28,4 @@ ssize_t write(int fd, const void *buf, size_t count)
     return (ssize_t)count;
 }
 
-void init(void) { printf("Hello, world!\n"); }
+void init(void) { panic("init() has run"); }

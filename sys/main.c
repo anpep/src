@@ -15,12 +15,6 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdint.h>
-
 void init(void);
 
-int __attribute__((noreturn)) main(void)
-{
-    init();
-    for (;;) { }
-}
+int __attribute__((noreturn)) main(void) { init(); }
