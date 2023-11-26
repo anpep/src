@@ -1,20 +1,20 @@
 name: test
 on:
   push:
-    branches: [trunk]
+    branches: [ trunk ]
   pull_request:
-    branches: [trunk]
+    branches: [ trunk ]
 jobs:
-  test-lib:
+  test-libc:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        cc: [gcc, clang]
+        os: [ ubuntu-latest, macos-latest ]
+        cc: [ gcc, clang ]
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@main
-    - name: Run library tests
-      run: make lib_test
-      env:
-        CC: ${{ matrix.cc }}
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Run libc tests
+        run: make lib_test/libc
+        env:
+          CC: ${{ matrix.cc }}

@@ -17,4 +17,10 @@
 
 void init(void);
 
-int __attribute__((noreturn)) main(void) { init(); }
+int __attribute__((noreturn)) main(void)
+{
+    init();
+    for (;;) {
+        __asm__("wfi");
+    }
+}

@@ -33,6 +33,7 @@ void __attribute__((noreturn)) panic(const char *fmt, ...)
     va_end(v);
     regs_print(&r);
     puts("system halted\n");
-    for (;;)
+    for (;;) {
         __asm__("wfi");
+    }
 }

@@ -25,20 +25,23 @@ int regs_print(const struct regs *r)
     /* Temporary registers t0-t6. */
     for (int t = 0; t <= 6; t++, rb++) {
         printf("t%-3d=0x%08x\t", t, *rb);
-        if (t % 3 > 1 || t == 6)
+        if (t % 3 > 1 || t == 6) {
             puts("\n");
+        }
     }
     /* Saved registers s0-s11. */
     for (int s = 0; s <= 11; s++, rb++) {
         printf("s%-3d=0x%08x\t", s, *rb);
-        if (s % 3 > 1 || s == 11)
+        if (s % 3 > 1 || s == 11) {
             puts("\n");
+        }
     }
     /* Function argument registers a0-a7. */
     for (int a = 0; a <= 7; a++, rb++) {
         printf("a%-3d=0x%08x\t", a, *rb);
-        if (a % 3 > 1 || a == 7)
+        if (a % 3 > 1 || a == 7) {
             puts("\n");
+        }
     }
     /* Special registers. */
     printf("zero=0x%08x\t", r->zero);

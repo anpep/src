@@ -33,7 +33,7 @@ BINARIES := $(patsubst %.c,%,${SOURCES})
 all: test
 
 test: ${BINARIES}
-	for test in $^ ; do ./$$test||exit 1; done
+	for test in $^ ; do ./$$test&&rm ./$$test||exit 1; done
 
 clean:
 	${RM} ${BINARIES} *.gcno *.gcda *.gcov

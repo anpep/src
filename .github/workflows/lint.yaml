@@ -1,14 +1,14 @@
 name: lint
 on:
   push:
-    branches: [trunk]
+    branches: [ trunk ]
   pull_request:
-    branches: [trunk]
+    branches: [ trunk ]
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@main
-    - name: Lint headers and source code
-      run: make lint
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Lint headers and source code
+        run: make lint
