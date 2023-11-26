@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [trunk]
 jobs:
-  sys:
+  test-lib:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]

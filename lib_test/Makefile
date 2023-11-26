@@ -23,7 +23,7 @@ CLANG_FORMAT_FLAGS ?= -style file -Werror
 CLANG_TIDY_FLAGS ?= -header-filter=.*
 CFLAGS := \
 	-std=c99 -fprofile-arcs -ftest-coverage \
-	-fsanitize=undefined -fsanitize=nullability -fno-sanitize=signed-integer-overflow \
+	-fsanitize=undefined -fno-sanitize=signed-integer-overflow \
 	-Wall -Wextra -Wpedantic -pedantic -Wno-unused-variable -Wno-unused-parameter \
 	-I../include
 
