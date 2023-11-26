@@ -1,9 +1,5 @@
 name: build
-on:
-  push:
-    branches: [trunk]
-  pull_request:
-    branches: [trunk]
+on: [push, pull_request]
 jobs:
   build-lib:
     strategy:
