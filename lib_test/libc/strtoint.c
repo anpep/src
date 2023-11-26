@@ -47,6 +47,13 @@ static void test_strtol(void)
     assert(errno == 0);
     assert(!strcmp(endptr, "nice"));
 
+    /* Test hex string. */
+    errno = 0;
+    input = "cd0";
+    rc = strtol(input, &endptr, 10);
+    assert(rc == 0);
+    assert(!strcmp(endptr, "cd0"));
+
     /* Test octal guess. */
     errno = 0;
     input = "0777";
