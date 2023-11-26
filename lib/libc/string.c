@@ -54,6 +54,7 @@ void *memset(void *dst, int v, size_t len)
 {
     unsigned char *buf = ((unsigned char *)dst);
     for (size_t i = 0; i < len; i++) {
-        buf[i] = ((unsigned char)(v & 0xFF));
+        buf[i] = (unsigned char)v & 0xFFU;
     }
+    return dst;
 }
