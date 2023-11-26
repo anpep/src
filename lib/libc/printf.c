@@ -104,7 +104,7 @@ ssize_t vfprintf_impl(
             }
         } else if (cs.conv == 'd' || cs.conv == 'i' || cs.conv == 'D') {
             /* Write a signed integer. */
-            intmax_t val = va_arg(args, intmax_t);
+            int val = va_arg(args, int);
             char conv[64];
             buf = &conv;
 
@@ -138,7 +138,7 @@ ssize_t vfprintf_impl(
             || cs.conv == 'u' || cs.conv == 'o' || cs.conv == 'x'
             || cs.conv == 'p') {
             /* Write an unsigned integer. */
-            uintmax_t val = va_arg(args, uintmax_t);
+            unsigned val = va_arg(args, unsigned);
             char conv[64];
             buf = &conv;
 

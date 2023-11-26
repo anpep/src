@@ -17,6 +17,4 @@
 
 #include <errno.h>
 
-#ifndef _TEST
 int errno;
-#endif /* _TEST */
