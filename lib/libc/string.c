@@ -25,3 +25,35 @@ size_t strlen(const char *str)
     }
     return len;
 }
+
+int strcmp(const char *str1, const char *str2)
+{
+    while (*str1 != '\0' && *str1 == *str2) {
+        ++str1, ++str2;
+    }
+    return *str1 - *str2;
+}
+
+char *strcat(char *restrict dst, const char *restrict src)
+{
+    char *dst_orig = dst;
+    while (*dst++) { }
+    while ((*dst++ = *src++) != '\0') { }
+    return dst_orig;
+}
+
+char *strncat(char *restrict dst, const char *restrict src, size_t n)
+{
+    char *dst_orig = dst;
+    while (*dst++) { }
+    while (n-- > 0 && (*dst++ = *src++) != '\0') { }
+    return dst_orig;
+}
+
+void *memset(void *dst, int v, size_t len)
+{
+    unsigned char *buf = ((unsigned char *)dst);
+    for (size_t i = 0; i < len; i++) {
+        buf[i] = ((unsigned char)(v & 0xFF));
+    }
+}
