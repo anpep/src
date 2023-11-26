@@ -93,7 +93,6 @@ static int parse_flags(struct convspec *convspec, const char *fmt)
             return rc;
         }
     }
-
     return rc;
 }
 
@@ -194,7 +193,6 @@ static int parse_length_modifier(struct convspec *convspec, const char *fmt)
         /* Skip no characters. */
         return 0;
     }
-
     convspec->has_len = 1;
     return rc;
 }
@@ -251,7 +249,6 @@ static int parse_specifier(struct convspec *cs, const char *fmt)
             /* '#' is not supported for 'd' specifier. */
             return -1;
         }
-
         /* ' ' and '+' are mutually exclusive for 'd' specifier. */
         if ((cs->flags & (CONVSPEC_SPACE | CONVSPEC_PLUS))
             == (CONVSPEC_SPACE | CONVSPEC_PLUS)) {
@@ -282,6 +279,7 @@ static int parse_specifier(struct convspec *cs, const char *fmt)
             /* '#' is not supported for 'u' or 'o' specifiers. */
             return -1;
         }
+        /* Fall through. */
     case 'X':
     case 'x':
         if ((cs->flags & (CONVSPEC_SPACE | CONVSPEC_PLUS)) != 0) {
@@ -311,12 +309,10 @@ static int parse_specifier(struct convspec *cs, const char *fmt)
         /* TODO: Implement this specifier. */
         errno = ENOSYS;
         return -1;
-
     default:
         /* Invalid or unsupported specifier. */
         return -1;
     }
-
     cs->conv = *fmt;
     return 1;
 }
