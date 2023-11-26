@@ -100,17 +100,23 @@ static intmax_t strtoint(const char *restrict nptr, char **restrict endptr,
     for (int digit;; nptr++) {
         if (isdigit(*nptr)) {
             digit = *nptr - '0';
-        } else if (*nptr >= 'a' && *nptr <= ('a' + base - 1)) {
+        } else if (*nptr >= 'a' && *nptr <= 'z') {
             digit = *nptr - 'a' + 10;
-        } else if (*nptr >= 'A' && *nptr <= ('A' + base - 1)) {
+        } else if (*nptr >= 'A' && *nptr <= 'z') {
             digit = *nptr - 'A' + 10;
         } else {
+            /* Set invalid value for overflowing. */
+            digit = -1;
+        }
+
+        if (digit < 0 || digit >= base) {
             /* Invalid value for the digit -- finished conversion. */
             if (endptr != NULL) {
                 *endptr = (char *)nptr;
             }
             break;
         }
+
         if (sign == +1 && (intmax_t)(base * val + digit) < (intmax_t)val) {
             errno = ERANGE;
             if (endptr != NULL) {
