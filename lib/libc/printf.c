@@ -54,7 +54,7 @@ static ssize_t pad(struct convspec *convspec, struct pad_opts pad_opts,
         /* Minus flag was not specified (no trailing padding to be done). */
         return 0;
     }
-    if (convspec->width == 0 || pad_opts.len > convspec->width) {
+    if (convspec->width == 0 || pad_opts.len >= convspec->width) {
         /* No padding to be done, or text overflows. */
         return 0;
     }

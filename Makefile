@@ -15,7 +15,11 @@
 ## this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+<<<<<<< Updated upstream
 TARGETS := lib lib_test
+=======
+TARGETS := lib/libc lib_test/libc sys
+>>>>>>> Stashed changes
 
 .PHONY: mkcompdb all
 all: mkcompdb ${TARGETS}
