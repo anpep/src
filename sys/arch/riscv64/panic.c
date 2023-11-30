@@ -17,8 +17,11 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <sys/arch/riscv64/csr.h>
 #include <sys/arch/riscv64/regs.h>
 #include <sys/panic.h>
+
+extern void __attribute__((noreturn)) _end(void);
 
 void __attribute__((noreturn)) panic(const char *fmt, ...)
 {
@@ -27,13 +30,11 @@ void __attribute__((noreturn)) panic(const char *fmt, ...)
 
     regs_save(&r);
     va_start(v, fmt);
-    puts("panic: ");
+    printf("panic: ");
     vprintf(fmt, v);
     putchar('\n');
     va_end(v);
     regs_print(&r);
     puts("system halted\n");
-    for (;;) {
-        __asm__("wfi");
-    }
+    _end();
 }

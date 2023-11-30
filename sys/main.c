@@ -15,12 +15,4 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-void init(void);
-
-int __attribute__((noreturn)) main(void)
-{
-    init();
-    for (;;) {
-        __asm__("wfi");
-    }
-}
+void main(void) { __asm__("ecall"); }

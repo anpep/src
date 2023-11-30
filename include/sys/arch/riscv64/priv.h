@@ -15,31 +15,11 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.section .text
+enum spriv {
+    PRIV_USER = 0,
+    PRIV_SUPERVISOR = 1,
+};
 
-/* Disable compressed instructions. */
-.option norvc
-
-.type _start, @function
-.global _start
-_start:
-    .cfi_startproc
-    .cfi_undefined ra
-
-.option push
-.option norelax
-    /* We don't want linker relaxation to happen here because relaxation emits
-     * shorter instructions with addresses relative to the global pointer.
-     * Since the GP is still uninitialized, this behavior is undesirable! */
-    la gp, __global_pointer$
-.option pop
-
-    /* Reset SATP. */
-    csrw satp, zero
-
-    /* Set up the stack. */
-    la sp, __stack_top
-    add s0, sp, zero
-    jal zero, main
-    .cfi_endproc
-.end
+enum mpriv {
+    PRIV_MACHINE = 3,
+};
