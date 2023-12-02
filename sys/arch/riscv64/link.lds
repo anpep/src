@@ -21,23 +21,28 @@ ENTRY(_start);
 
 SECTIONS {
     .text : ALIGN(4K) {
-        *(.start);
-        *(.text);
+        PROVIDE(__text_start = .);
+        *(.text._start);
+        *(.text*);
+        PROVIDE(__text_end = .);
     }
+    PROVIDE(__global_pointer = .);
     .rodata : ALIGN(4K) {
-        *(.rodata);
+        PROVIDE(__rodata_start = .);
+        *(.rodata*);
+        PROVIDE(__rodata_end = .);
     }
     .data : ALIGN(4K) {
-        *(.data);
+        PROVIDE(__data_start = .);
+        *(.data*);
+        PROVIDE(__data_end = .);
     }
     .bss : ALIGN(4K) {
         PROVIDE(__bss_start = .);
-        *(.bss);
+        *(.bss*);
         PROVIDE(__bss_end = .);
     }
-    PROVIDE(__global_pointer = .);
-    PROVIDE(__stack_top = .);
-    . = 0x80008000;
-
+    PROVIDE(__stack_start = .);
+    PROVIDE(__stack_end = __stack_start + 0x80000);
     PROVIDE(__heap_start = .);
 }

@@ -19,16 +19,18 @@
 
 #include <stdint.h>
 
-#include "priv.h"
-
 enum csr {
+    CSR_SSTATUS = 0x100, /* Supervisor status register. */
+    CSR_STVEC = 0x105, /* Supervisor trap-handler base address. */
+    CSR_SSCRATCH = 0x140, /* Scratch register for supervisor trap handlers. */
+    CSR_SEPC = 0x141, /* Supervisor exception program counter. */
+    CSR_SCAUSE = 0x142, /* Supervisor trap cause. */
+    CSR_STVAL = 0x143, /* Supervisor bad address or instruction. */
     CSR_SATP = 0x180, /* Supervisor address translation and protection. */
 
     CSR_MHARTID = 0xF14, /* Hardware thread ID. */
-
     CSR_MSTATUS = 0x300, /* Machine status register. */
     CSR_MTVEC = 0x305, /* Machine trap-handler base address. */
-
     CSR_MEPC = 0x341, /* Machine exception program counter. */
     CSR_MCAUSE = 0x342, /* Machine trap cause. */
     CSR_MTVAL = 0x343, /* Machine bad address or instruction. */
@@ -60,7 +62,7 @@ csr_write(const enum csr num, uint64_t val)
     __asm__("csrw %0, %1" ::"i"(num), "r"(val));
 }
 
-/* Machine status register. */
+/* Supervisor-mode status register. */
 typedef union {
     struct {
         unsigned _wpri0 : 1;
@@ -71,9 +73,14 @@ typedef union {
         unsigned spie : 1;
         unsigned ube : 1;
         unsigned mpie : 1;
-        enum spriv spp : 1; /* S-level privilege mode. */
+        enum {
+            PRIV_USER = 0, /*U-level privilege. */
+            PRIV_SUPERVISOR = 1, /* S-level privilege. */
+        } spp : 1; /* S-level privilege mode. */
         unsigned vs : 2;
-        enum mpriv mpp : 2; /* M-level privilege mode. */
+        enum {
+            PRIV_MACHINE = 3, /* M-level privilege. */
+        } mpp : 2; /* M-level privilege mode. */
         unsigned fs : 2;
         unsigned xs : 2;
         unsigned mprv : 1;
@@ -92,3 +99,42 @@ typedef union {
     } fields;
     uint64_t value;
 } csr_mstatus_t;
+
+/* Supervisor address translation and protection register. */
+typedef union {
+    struct {
+        unsigned long long ppn : 44; /* Physical page number. */
+        unsigned asid : 16; /* Address space identifier. */
+        enum {
+            SATP_MODE_BARE = 0, /* No translation or protection. */
+            SATP_MODE_SV39 = 8, /* Page-based 39-bit virtual addressing. */
+            SATP_MODE_SV48 = 9, /* Page-based 48-bit virtual addressing. */
+            SATP_MODE_SV57 = 10, /* Page-based 57-bit virtual addressing. */
+        } mode : 4;
+    } fields;
+    uint64_t value;
+} csr_satp_t;
+
+/* PMP configuration register. */
+typedef union {
+    struct {
+        unsigned r : 1; /* Read. */
+        unsigned w : 1; /* Write. */
+        unsigned x : 1; /* Execute. */
+        enum {
+            ADDRMATCH_OFF = 0, /* Null region (disabled). */
+            ADDRMATCH_TOR = 1, /* Top of range. */
+            ADDRMATCH_NA4 = 2, /* Naturally aligned four-byte region. */
+            /* Naturally aligned power-of-two region, >= 8 bytes). */
+            ADDRMATCH_NAPOT = 3,
+        } a : 2; /* Address matching mode. */
+        unsigned zero : 2;
+        unsigned l : 1; /* Entry lock bit. */
+    } fields;
+    uint8_t value;
+} csr_pmpxcfg_t;
+
+typedef union {
+    csr_pmpxcfg_t regs[8];
+    uint64_t value;
+} csr_pmpcfgx_t;

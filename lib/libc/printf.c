@@ -138,21 +138,6 @@ ssize_t vfprintf_impl(
             || cs.conv == 'u' || cs.conv == 'o' || cs.conv == 'x'
             || cs.conv == 'p') {
             /* Write an unsigned integer. */
-            uintmax_t val;
-            switch (cs.len) {
-            case CONVSPEC_SIZE:
-            case CONVSPEC_LONG:
-                val = va_arg(args, unsigned long);
-                break;
-            case CONVSPEC_PTRDIFF:
-            case CONVSPEC_LONG_LONG:
-            case CONVSPEC_MAX:
-                val = va_arg(args, unsigned long long);
-                break;
-            default:
-                val = va_arg(args, unsigned);
-                break;
-            }
             char conv[64];
             buf = &conv;
 
@@ -160,9 +145,7 @@ ssize_t vfprintf_impl(
                 /* "%p" is equivalent to "%#x" or "%#lx". */
                 cs.conv = 'x';
                 cs.flags = CONVSPEC_HASH;
-                if (sizeof(void *) > sizeof(int)) {
-                    cs.len = CONVSPEC_LONG;
-                }
+                cs.len = CONVSPEC_LONG_LONG;
             }
 
             if ((cs.flags & CONVSPEC_HASH)
@@ -179,6 +162,22 @@ ssize_t vfprintf_impl(
                 base = 10;
             } else if (cs.conv == 'o' || cs.conv == 'O') {
                 base = 8;
+            }
+
+            uintmax_t val;
+            switch (cs.len) {
+            case CONVSPEC_SIZE:
+            case CONVSPEC_LONG:
+                val = va_arg(args, unsigned long);
+                break;
+            case CONVSPEC_PTRDIFF:
+            case CONVSPEC_LONG_LONG:
+            case CONVSPEC_MAX:
+                val = va_arg(args, unsigned long long);
+                break;
+            default:
+                val = va_arg(args, unsigned);
+                break;
             }
 
             const char lowerhex[16] = "0123456789abcdef";

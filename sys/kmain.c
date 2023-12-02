@@ -15,4 +15,11 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-void main(void) { __asm__("ecall"); }
+#include <stdio.h>
+
+void kmain(void)
+{
+    printf("Hello, world!\n");
+    /* Illegal instruction for testing trap handler. */
+    ((void (*)(void)) "..")();
+}

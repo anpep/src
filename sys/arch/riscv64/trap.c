@@ -15,7 +15,7 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "stddef.h"
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/arch/riscv64/csr.h>
@@ -40,7 +40,7 @@ static const char *exception_descs[] = {
     [15] = "Store/AMO page fault",
 };
 
-void __attribute__((noinline)) _trap(void)
+void _trap(void)
 {
     const uint64_t CAUSE_INT_MASK = 0x80000000;
     const uint64_t CAUSE_CODE_MASK = 0x7fffffff;
@@ -49,10 +49,10 @@ void __attribute__((noinline)) _trap(void)
     uint64_t cause_code = (cause & CAUSE_CODE_MASK);
 
     if ((cause & CAUSE_INT_MASK) != 0) {
-        /* Interrupt. */
-        printf("int: cause_code=0x%016llx\n", cause_code);
+        /* Asynchronous interrupt. */
+        printf("int: cause=0x%016llx\n", cause_code);
     } else {
-        /* Exception. */
+        /* Synchronous exception. */
         uint64_t hartid = csr_read(CSR_MHARTID);
         uint64_t epc = csr_read(CSR_MEPC);
         uint64_t tval = csr_read(CSR_MTVAL);
@@ -62,8 +62,8 @@ void __attribute__((noinline)) _trap(void)
         if (cause_code < descs_len && exception_descs[cause_code] != NULL) {
             desc = (char *)exception_descs[cause_code];
         }
-        panic("exception on hart %d at 0x%llx: %s "
-              "(cause=%lld, tval=0x%llx)",
+        panic("synchronous exception on hart %d at %p: %s "
+              "(cause=%lld, tval=%p)",
             hartid, epc, desc, cause_code, tval);
     }
 }
