@@ -1,0 +1,98 @@
+#!/bin/sh
+set -e
+if [ -f ".env" ]
+then
+    source .env
+fi
+
+print_usage()
+{
+    echo "usage: $0 [-d] KERNEL_IMAGE"
+    echo "       $0 -k"
+    echo "       $0 -s"
+    echo "       $0 -m"
+    echo "       $0 -x KERNEL_IMAGE"
+    echo
+}
+
+if [ -z "$1" ]
+then
+    print_usage
+    exit 1
+fi
+
+QEMU="qemu-system-$ARCH" 
+QEMU_FLAGS="""
+    -s 
+    -machine virt 
+    -bios none 
+    -serial chardev:serial0
+    -chardev socket,id=serial0,server=on,wait=off,telnet=off,host=127.0.0.1,port=6667,ipv4=on,ipv6=off
+    -gdb chardev:gdb0
+    -chardev socket,id=gdb0,server=on,wait=off,telnet=off,host=127.0.0.1,port=6668,ipv4=on,ipv6=off
+    -mon chardev=monitor0
+    -chardev socket,id=monitor0,server=on,wait=off,telnet=off,host=127.0.0.1,port=6666,ipv4=on,ipv6=off
+    -nographic -no-reboot
+"""
+
+TMUX_SESSION="""
+new -s my_sess # create new session
+neww -n /bin/zsh # create new window
+split-window -t /bin/zsh # split vertically the window just created
+"""
+
+if [ "$1" = "-d" ]
+then
+    if [ -z "$2" ]
+    then
+        print_usage
+        exit 1
+    fi
+    "$0" -k
+    "$QEMU" -S $QEMU_FLAGS -kernel "$2" &
+    sleep 1
+    $GDB -q -ex "layout split" -ex "target remote :6668" -ex "b _end" "$2"
+    "$0" -k
+else
+    case "$1" in
+        "-x")
+            if [ -z "$2" ]
+            then
+                print_usage
+                exit 1
+            fi
+            SESSION=$USER
+            tmux -2 new-session -d -s $SESSION
+            tmux set -g mouse on
+            tmux bind-key -n C-w kill-server
+            tmux new-window -t $SESSION:1
+            tmux split-window -h
+            tmux split-window -v
+            tmux select-window -t $SESSION:1
+            tmux select-pane -t 1
+            tmux send-keys "clear;'$0' -m" C-m
+            tmux select-pane -t 2
+            tmux send-keys "clear;'$0' -s" C-m
+            tmux select-pane -t 0
+            tmux send-keys "clear;'$0' -d $2" C-m
+            tmux select-window -t $SESSION:1
+            tmux -2 attach-session -t $SESSION
+            ;;
+
+        "-k")
+            (killall "$QEMU"2&>/dev/null)||:
+            ;;
+
+        "-m")
+            while ! nc localhost 6666 ; do sleep 1 ; done
+            ;;
+
+        "-s")
+            while ! nc localhost 6667 ; do sleep 1 ; done
+            ;;
+
+        *)
+            "$QEMU" $QEMU_FLAGS -kernel "$1"
+            ;;
+    esac
+fi
