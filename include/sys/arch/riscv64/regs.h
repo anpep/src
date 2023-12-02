@@ -15,28 +15,16 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#pragma once
 
-int putchar(int val)
-{
-    ssize_t rc;
-    rc = write(0, &val, 1);
-    if (rc < 0) {
-        return (int)rc;
-    }
-    return 0;
-}
+#include <stdint.h>
 
-int puts(const char *str)
-{
-    ssize_t rc;
-    rc = write(0, str, strlen(str));
-    if (rc < 0) {
-        errno = (int)rc;
-        return EOF;
-    }
-    return 0;
-}
+struct regs {
+    uint64_t t0, t1, t2, t3, t4, t5, t6;
+    uint64_t s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
+    uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
+    uint64_t zero, ra, sp, gp, tp;
+};
+
+int regs_save(struct regs *);
+int regs_print(const struct regs *);

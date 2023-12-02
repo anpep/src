@@ -15,28 +15,26 @@
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <sys/arch/riscv64/csr.h>
+#include <sys/arch/riscv64/regs.h>
+#include <sys/panic.h>
 
-int putchar(int val)
-{
-    ssize_t rc;
-    rc = write(0, &val, 1);
-    if (rc < 0) {
-        return (int)rc;
-    }
-    return 0;
-}
+extern void __attribute__((noreturn)) _end(void);
 
-int puts(const char *str)
+void __attribute__((noreturn)) panic(const char *fmt, ...)
 {
-    ssize_t rc;
-    rc = write(0, str, strlen(str));
-    if (rc < 0) {
-        errno = (int)rc;
-        return EOF;
-    }
-    return 0;
+    struct regs r;
+    va_list v;
+
+    regs_save(&r);
+    va_start(v, fmt);
+    printf("panic: ");
+    vprintf(fmt, v);
+    putchar('\n');
+    va_end(v);
+    regs_print(&r);
+    puts("system halted\n");
+    _end();
 }

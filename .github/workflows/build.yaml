@@ -1,16 +1,29 @@
 name: build
-on: [push, pull_request]
+on: [ push, pull_request ]
 jobs:
   build-lib:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        cc: [gcc, clang]
+        os: [ ubuntu-latest, macos-latest ]
+        cc: [ gcc, clang ]
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@main
-    - name: Build library sources
-      run: make lib
-      env:
-        CC: ${{ matrix.cc }}
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Build library sources
+        run: make lib/libc
+        env:
+          CC: ${{ matrix.cc }}
+  build-sys:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        cc: [ gcc, clang ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Build system sources
+        run: make sys
+        env:
+          CC: ${{ matrix.cc }}

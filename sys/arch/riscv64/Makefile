@@ -15,27 +15,15 @@
 ## this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-TARGETS := libc
+export ARCH_PREFIX ?= riscv64-unknown-elf-
+export CC := ${ARCH_PREFIX}gcc
+export AS := ${ARCH_PREFIX}as
+export LD := ${ARCH_PREFIX}gcc
+export AR := ${ARCH_PREFIX}ar
 
-.PHONY: all
-all: ${TARGETS}
-.PHONY: clean $(addprefix clean_,${TARGETS})
-clean: $(addprefix clean_,${TARGETS})
+export ARCH_CFLAGS := -ggdb -mcmodel=medany -ffunction-sections
+export ARCH_LDFLAGS := -T${ARCH_PATH}/link.lds
 
-.PHONY: lint $(addprefix lint_,${TARGETS})
-lint: $(addprefix lint_,${TARGETS})
-
-FORCE: ;
-
-define target_template
-${1}: FORCE
-	@${MAKE} -C ${1}
-
-clean_${1}: FORCE
-	@${MAKE} -C ${1} clean
-
-lint_${1}: FORCE
-	@${MAKE} -C ${1} lint
-endef
-
-$(foreach target,${TARGETS},$(eval $(call target_template,${target})))
+export ARCH_HEADERS := $(wildcard ${ARCH_PATH}/*/*.h ${ARCH_PATH}/*.h)
+export ARCH_SOURCES := $(wildcard ${ARCH_PATH}/*/*.S ${ARCH_PATH}/*.S) $(wildcard ${ARCH_PATH}/*/*.c ${ARCH_PATH}/*.c)
+export ARCH_TARGET := boot.elf

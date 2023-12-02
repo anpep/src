@@ -42,6 +42,11 @@ int putchar(int val);
  * @return     On success, 0 is returned. Otherwise, the value of @ref errno is
  *             set and @ref EOF is returned.
  */
+
+/**
+ * hello
+ * world
+ */
 int puts(const char *str);
 
 /**
@@ -69,5 +74,6 @@ int sprintf(char *restrict dest, const char *restrict fmt, ...);
  */
 int vprintf(const char *restrict fmt, va_list args);
 
-int vsnprintf(char *restrict dest, size_t n, const char *restrict fmt, va_list args);
+int vsnprintf(
+    char *restrict dest, size_t n, const char *restrict fmt, va_list args);
 int vsprintf(char *restrict dest, const char *restrict fmt, va_list args);

@@ -1,0 +1,11 @@
+#!/bin/sh
+if [ -z "${ARCH}" ]
+then
+  ARCH=riscv64
+fi
+"qemu-system-${ARCH}" \
+  -machine virt \
+  -bios none \
+  -kernel "$1" \
+  -serial mon:stdio \
+  -nographic

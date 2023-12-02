@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ -z "${ARCH}" ]
+then
+  ARCH=riscv64
+fi
+killall "qemu-system-${ARCH}"
+exec "qemu-system-${ARCH}" -s -S \
+  -machine virt \
+  -bios none \
+  -kernel "$1" \
+  -serial mon:stdio \
+  -nographic &
+echo "QEMU is running"
